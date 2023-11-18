@@ -1,5 +1,9 @@
+// main.dart
+
 import 'package:flutter/material.dart';
+import 'dart:convert'; // Importar la librería necesaria para Base64
 import 'Tranferencias/indextranferencias.dart';
+import 'Registros.dart';
 
 void main() {
   runApp(MyApp());
@@ -42,7 +46,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  //imagen cagarda desde los archivos
                   children: [
                     Image.asset(
                       'assets/BBVA_2019.png',
@@ -80,27 +83,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: 32),
                     ElevatedButton(
-                      onPressed: () {
-                        // Lógica para iniciar sesión
-                        if (_usernameController.text == 'javier' &&
-                            _passwordController.text == '123456') {
-                          // Si las credenciales son correctas, redirige a la otra vista
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Indextranferencias(),
-                            ),
-                          );
-                        } else {
-                          // Muestra un mensaje de error si las credenciales son incorrectas
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Usuario o contraseña incorrectos'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      },
+                      onPressed: _handleLogin, // Utilizar el nuevo método
                       style: ElevatedButton.styleFrom(
                         primary: Color(0xFF0099FF), // Azul claro
                         shape: RoundedRectangleBorder(
@@ -115,13 +98,17 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(height: 16),
                     TextButton(
                       onPressed: () {
-                        // aqui se colocara logica o un metodo donde se valide el registro del usuario
-                        print('Ir a la página de registro');
+                        // Navegar a la página de registro
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RegistrationPage(),
+                          ),
+                        );
                       },
                       child: Text(
                         '¿No tienes una cuenta? Regístrate',
-                        style:
-                            TextStyle(color: Color(0xFF0099FF)), // Azul claro
+                        style: TextStyle(color: Color(0xFF0099FF)),
                       ),
                     ),
                   ],
@@ -133,4 +120,59 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
+  // Método para manejar la lógica de inicio de sesión
+  void _handleLogin() {
+    // Validar que el nombre de usuario no contenga caracteres especiales ni espacios vacíos
+    if (_usernameController.text.contains(RegExp(r'[^\w]')) ||
+        _usernameController.text.contains(' ')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Nombre de usuario no válido'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Validar que la contraseña no contenga caracteres especiales
+    if (_passwordController.text.contains(RegExp(r'[^\w]'))) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              Text('La contraseña no puede contener caracteres especiales'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Encriptar la contraseña usando Base64
+    String encryptedPassword =
+        base64.encode(utf8.encode(_passwordController.text));
+    print(encryptedPassword);
+    print(_usernameController.text);
+    // Lógica para iniciar sesión
+    if (_usernameController.text == 'javier' &&
+        encryptedPassword == 'MTIzNDU2') {
+      // Si las credenciales son correctas, redirige a la vista Indextranferencias
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Indextranferencias(),
+        ),
+      );
+    } else {
+      // Muestra un mensaje de error si las credenciales son incorrectas
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Usuario o contraseña incorrectos'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 }
+
+// ... (tu código existente)
+
