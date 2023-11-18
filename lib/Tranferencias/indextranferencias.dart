@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'TramitesTransferencia.dart';
 
 class Indextranferencias extends StatelessWidget {
   @override
@@ -7,7 +8,7 @@ class Indextranferencias extends StatelessWidget {
       appBar: AppBar(
         title: Text('Bienvenido'),
         centerTitle: true,
-        backgroundColor: Color(0xFF003366), // Azul oscuro similar al BBVA
+        backgroundColor: Color(0xFF003366), // Azul oscuro
       ),
       body: Center(
         child: Column(
@@ -19,7 +20,7 @@ class Indextranferencias extends StatelessWidget {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF003366), // Azul oscuro similar al BBVA
+                color: Color(0xFF003366), // Azul oscuro
               ),
             ),
             SizedBox(height: 16),
@@ -30,7 +31,7 @@ class Indextranferencias extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => OtraVista(),
+                    builder: (context) => BuscarUsuarioScreen(),
                   ),
                 );
               },
@@ -133,22 +134,6 @@ class TransferenciaItem extends StatelessWidget {
         ),
         SizedBox(height: 8),
       ],
-    );
-  }
-}
-
-class OtraVista extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Transferencias'),
-        centerTitle: true,
-        backgroundColor: Color(0xFF003366), // Azul oscuro
-      ),
-      body: Center(
-        child: Text('otra vista'),
-      ),
     );
   }
 }
