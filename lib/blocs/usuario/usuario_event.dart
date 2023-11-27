@@ -1,17 +1,17 @@
-part of 'usuario_bloc.dart';
+// part of 'usuario_bloc.dart';
 
-sealed class UsuarioEvent extends Equatable {
-  const UsuarioEvent();
+// sealed class UsuarioEvent extends Equatable {
+//   const UsuarioEvent();
 
-  @override
-  List<Object> get props => [];
-}
+//   @override
+//   List<Object> get props => [];
+// }
 
-class InitUsuario extends UsuarioEvent{}
+// class InitUsuario extends UsuarioEvent{}
 
-class getAllusuarios extends UsuarioEvent{}
+// class getAllusuarios extends UsuarioEvent{}
 
-class saveUsuario extends UsuarioEvent{
-  final Usuario usuario;
-  const saveUsuario ({required this.usuario});
-}
+// class saveUsuario extends UsuarioEvent{
+//   final Usuario usuario;
+//   const saveUsuario ({required this.usuario});
+// }

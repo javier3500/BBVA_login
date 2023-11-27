@@ -5,7 +5,18 @@ import 'dart:convert'; // Importar la librería necesaria para Base64
 import 'Tranferencias/indextranferencias.dart';
 import 'Registros.dart';
 
-void main() {
+
+//base de datos
+import 'package:isar/isar.dart';
+import 'package:login_session/DB/isar.dart';
+
+//entidades
+import 'package:login_session/DB/entities/usuario.dart';
+
+
+void main() async {
+   WidgetsFlutterBinding.ensureInitialized(); //Inicializar conexión
+   await IsarHelper.instance.init(); //inicializar el esquema de base de datos
   runApp(MyApp());
 }
 
@@ -26,9 +37,19 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  
+  get controller => null;
+  
+  get contrasena => null;
 
+  void dispose(){
+    controller.dispose();
+    super.dispose();
+
+  }
   @override
   Widget build(BuildContext context) {
+   // final dao = UserDao();
     return Scaffold(
       backgroundColor: Color(0xFF003366), // Azul oscuro
       body: Center(
@@ -122,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // Método para manejar la lógica de inicio de sesión
-  void _handleLogin() {
+  Future<void> _handleLogin() async {
     // Validar que el nombre de usuario no contenga caracteres especiales ni espacios vacíos
     if (_usernameController.text.contains(RegExp(r'[^\w]')) ||
         _usernameController.text.contains(' ')) {
@@ -147,32 +168,45 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
+    //final user = User()
     // Encriptar la contraseña usando Base64
-    String encryptedPassword =
-        base64.encode(utf8.encode(_passwordController.text));
-    print(encryptedPassword);
-    print(_usernameController.text);
+    // String encryptedPassword =
+    //     base64.encode(utf8.encode(_passwordController.text));
+    // print(encryptedPassword);
+    // print(_usernameController.text);
     // Lógica para iniciar sesión
-    if (_usernameController.text == 'javier' &&
-        encryptedPassword == 'MTIzNDU2') {
-      // Si las credenciales son correctas, redirige a la vista Indextranferencias
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => Indextranferencias(),
-        ),
-      );
-    } else {
-      // Muestra un mensaje de error si las credenciales son incorrectas
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Usuario o contraseña incorrectos'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+  
+   final Autentico = await verificar(_usernameController.text, _passwordController.text);
+   print (Autentico);
+   print(Autentico.isEmpty);
+    
+    // if (Autentico) {
+    //   // Si las credenciales son correctas, redirige a la vista Indextranferencias
+    //   Navigator.push(
+    //     context,
+    //     MaterialPageRoute(
+    //       builder: (context) => Indextranferencias(),
+    //     ),
+    //   );
+    // } else {
+    //   // Muestra un mensaje de error si las credenciales son incorrectas
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(
+    //       content: Text('Usuario o contraseña incorrectos'),
+    //       backgroundColor: Colors.red,
+    //     ),
+    //   );
+    // }
   }
+  
+ Future<List<usuario>> verificar(String nombre, String pass) async {
+  print(nombre);
+    print(pass);
+    final isar = IsarHelper.instance.isar;
+     return isar.usuarios.filter()
+    .nombre_usuarioContains(nombre)
+    .and()
+    .contrasenaContains(pass)
+    .findAll();
+ }
 }
-
-// ... (tu código existente)
-

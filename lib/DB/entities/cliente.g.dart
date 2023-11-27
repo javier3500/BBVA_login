@@ -40,7 +40,7 @@ const ClienteSchema = CollectionSchema(
     r'saldo': PropertySchema(
       id: 4,
       name: r'saldo',
-      type: IsarType.string,
+      type: IsarType.long,
     ),
     r'telefono': PropertySchema(
       id: 5,
@@ -115,12 +115,6 @@ int _clienteEstimateSize(
     }
   }
   {
-    final value = object.saldo;
-    if (value != null) {
-      bytesCount += 3 + value.length * 3;
-    }
-  }
-  {
     final value = object.telefono;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
@@ -139,7 +133,7 @@ void _clienteSerialize(
   writer.writeString(offsets[1], object.correo);
   writer.writeString(offsets[2], object.domicilio);
   writer.writeString(offsets[3], object.nombre_completo);
-  writer.writeString(offsets[4], object.saldo);
+  writer.writeLong(offsets[4], object.saldo);
   writer.writeString(offsets[5], object.telefono);
 }
 
@@ -155,7 +149,7 @@ cliente _clienteDeserialize(
   object.domicilio = reader.readStringOrNull(offsets[2]);
   object.id = id;
   object.nombre_completo = reader.readStringOrNull(offsets[3]);
-  object.saldo = reader.readStringOrNull(offsets[4]);
+  object.saldo = reader.readLongOrNull(offsets[4]);
   object.telefono = reader.readStringOrNull(offsets[5]);
   return object;
 }
@@ -176,7 +170,7 @@ P _clienteDeserializeProp<P>(
     case 3:
       return (reader.readStringOrNull(offset)) as P;
     case 4:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 5:
       return (reader.readStringOrNull(offset)) as P;
     default:
@@ -1053,54 +1047,46 @@ extension clienteQueryFilter
   }
 
   QueryBuilder<cliente, cliente, QAfterFilterCondition> saldoEqualTo(
-    String? value, {
-    bool caseSensitive = true,
-  }) {
+      int? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'saldo',
         value: value,
-        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<cliente, cliente, QAfterFilterCondition> saldoGreaterThan(
-    String? value, {
+    int? value, {
     bool include = false,
-    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
         property: r'saldo',
         value: value,
-        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<cliente, cliente, QAfterFilterCondition> saldoLessThan(
-    String? value, {
+    int? value, {
     bool include = false,
-    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
         property: r'saldo',
         value: value,
-        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<cliente, cliente, QAfterFilterCondition> saldoBetween(
-    String? lower,
-    String? upper, {
+    int? lower,
+    int? upper, {
     bool includeLower = true,
     bool includeUpper = true,
-    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
@@ -1109,75 +1095,6 @@ extension clienteQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<cliente, cliente, QAfterFilterCondition> saldoStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'saldo',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<cliente, cliente, QAfterFilterCondition> saldoEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'saldo',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<cliente, cliente, QAfterFilterCondition> saldoContains(
-      String value,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'saldo',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<cliente, cliente, QAfterFilterCondition> saldoMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'saldo',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<cliente, cliente, QAfterFilterCondition> saldoIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'saldo',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<cliente, cliente, QAfterFilterCondition> saldoIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'saldo',
-        value: '',
       ));
     });
   }
@@ -1585,10 +1502,9 @@ extension clienteQueryWhereDistinct
     });
   }
 
-  QueryBuilder<cliente, cliente, QDistinct> distinctBySaldo(
-      {bool caseSensitive = true}) {
+  QueryBuilder<cliente, cliente, QDistinct> distinctBySaldo() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'saldo', caseSensitive: caseSensitive);
+      return query.addDistinctBy(r'saldo');
     });
   }
 
@@ -1632,7 +1548,7 @@ extension clienteQueryProperty
     });
   }
 
-  QueryBuilder<cliente, String?, QQueryOperations> saldoProperty() {
+  QueryBuilder<cliente, int?, QQueryOperations> saldoProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'saldo');
     });

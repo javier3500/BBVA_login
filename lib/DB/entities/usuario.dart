@@ -5,14 +5,14 @@ part 'usuario.g.dart';
 
 @collection 
 class usuario {
-  Id id = Isar.autoIncrement;
+  Id id =  Isar.autoIncrement;
   
   String? nombre_usuario;
   String? contrasena;
   
 
-  @Index(unique: true, name: 'Id_usuario')
-  int? Id_usuario = Isar.autoIncrement;
+  @Index(unique: true, name: 'id')
+
   
   final Id_cliente = IsarLink<cliente>();
 }

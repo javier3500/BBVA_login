@@ -27,8 +27,13 @@ const TransaccionSchema = CollectionSchema(
       name: r'fecha',
       type: IsarType.string,
     ),
-    r'monto': PropertySchema(
+    r'id_transaccion': PropertySchema(
       id: 2,
+      name: r'id_transaccion',
+      type: IsarType.long,
+    ),
+    r'monto': PropertySchema(
+      id: 3,
       name: r'monto',
       type: IsarType.string,
     )
@@ -37,8 +42,22 @@ const TransaccionSchema = CollectionSchema(
   serialize: _transaccionSerialize,
   deserialize: _transaccionDeserialize,
   deserializeProp: _transaccionDeserializeProp,
-  idName: r'id_transaccion',
-  indexes: {},
+  idName: r'id',
+  indexes: {
+    r'id_transaccion': IndexSchema(
+      id: 902735842365838151,
+      name: r'id_transaccion',
+      unique: true,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'id_transaccion',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    )
+  },
   links: {
     r'Id_cliente': LinkSchema(
       id: 6310084906718950114,
@@ -89,7 +108,8 @@ void _transaccionSerialize(
 ) {
   writer.writeString(offsets[0], object.concepto);
   writer.writeString(offsets[1], object.fecha);
-  writer.writeString(offsets[2], object.monto);
+  writer.writeLong(offsets[2], object.id_transaccion);
+  writer.writeString(offsets[3], object.monto);
 }
 
 transaccion _transaccionDeserialize(
@@ -101,8 +121,9 @@ transaccion _transaccionDeserialize(
   final object = transaccion();
   object.concepto = reader.readStringOrNull(offsets[0]);
   object.fecha = reader.readStringOrNull(offsets[1]);
-  object.id_transaccion = id;
-  object.monto = reader.readStringOrNull(offsets[2]);
+  object.id = id;
+  object.id_transaccion = reader.readLongOrNull(offsets[2]);
+  object.monto = reader.readStringOrNull(offsets[3]);
   return object;
 }
 
@@ -118,6 +139,8 @@ P _transaccionDeserializeProp<P>(
     case 1:
       return (reader.readStringOrNull(offset)) as P;
     case 2:
+      return (reader.readLongOrNull(offset)) as P;
+    case 3:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -125,7 +148,7 @@ P _transaccionDeserializeProp<P>(
 }
 
 Id _transaccionGetId(transaccion object) {
-  return object.id_transaccion;
+  return object.id;
 }
 
 List<IsarLinkBase<dynamic>> _transaccionGetLinks(transaccion object) {
@@ -134,89 +157,263 @@ List<IsarLinkBase<dynamic>> _transaccionGetLinks(transaccion object) {
 
 void _transaccionAttach(
     IsarCollection<dynamic> col, Id id, transaccion object) {
-  object.id_transaccion = id;
+  object.id = id;
   object.Id_cliente.attach(
       col, col.isar.collection<cliente>(), r'Id_cliente', id);
 }
 
+extension transaccionByIndex on IsarCollection<transaccion> {
+  Future<transaccion?> getById_transaccion(int? id_transaccion) {
+    return getByIndex(r'id_transaccion', [id_transaccion]);
+  }
+
+  transaccion? getById_transaccionSync(int? id_transaccion) {
+    return getByIndexSync(r'id_transaccion', [id_transaccion]);
+  }
+
+  Future<bool> deleteById_transaccion(int? id_transaccion) {
+    return deleteByIndex(r'id_transaccion', [id_transaccion]);
+  }
+
+  bool deleteById_transaccionSync(int? id_transaccion) {
+    return deleteByIndexSync(r'id_transaccion', [id_transaccion]);
+  }
+
+  Future<List<transaccion?>> getAllById_transaccion(
+      List<int?> id_transaccionValues) {
+    final values = id_transaccionValues.map((e) => [e]).toList();
+    return getAllByIndex(r'id_transaccion', values);
+  }
+
+  List<transaccion?> getAllById_transaccionSync(
+      List<int?> id_transaccionValues) {
+    final values = id_transaccionValues.map((e) => [e]).toList();
+    return getAllByIndexSync(r'id_transaccion', values);
+  }
+
+  Future<int> deleteAllById_transaccion(List<int?> id_transaccionValues) {
+    final values = id_transaccionValues.map((e) => [e]).toList();
+    return deleteAllByIndex(r'id_transaccion', values);
+  }
+
+  int deleteAllById_transaccionSync(List<int?> id_transaccionValues) {
+    final values = id_transaccionValues.map((e) => [e]).toList();
+    return deleteAllByIndexSync(r'id_transaccion', values);
+  }
+
+  Future<Id> putById_transaccion(transaccion object) {
+    return putByIndex(r'id_transaccion', object);
+  }
+
+  Id putById_transaccionSync(transaccion object, {bool saveLinks = true}) {
+    return putByIndexSync(r'id_transaccion', object, saveLinks: saveLinks);
+  }
+
+  Future<List<Id>> putAllById_transaccion(List<transaccion> objects) {
+    return putAllByIndex(r'id_transaccion', objects);
+  }
+
+  List<Id> putAllById_transaccionSync(List<transaccion> objects,
+      {bool saveLinks = true}) {
+    return putAllByIndexSync(r'id_transaccion', objects, saveLinks: saveLinks);
+  }
+}
+
 extension transaccionQueryWhereSort
     on QueryBuilder<transaccion, transaccion, QWhere> {
-  QueryBuilder<transaccion, transaccion, QAfterWhere> anyId_transaccion() {
+  QueryBuilder<transaccion, transaccion, QAfterWhere> anyId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterWhere> anyId_transaccion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'id_transaccion'),
+      );
     });
   }
 }
 
 extension transaccionQueryWhere
     on QueryBuilder<transaccion, transaccion, QWhereClause> {
-  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
-      id_transaccionEqualTo(Id id_transaccion) {
+  QueryBuilder<transaccion, transaccion, QAfterWhereClause> idEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IdWhereClause.between(
-        lower: id_transaccion,
-        upper: id_transaccion,
+        lower: id,
+        upper: id,
       ));
     });
   }
 
-  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
-      id_transaccionNotEqualTo(Id id_transaccion) {
+  QueryBuilder<transaccion, transaccion, QAfterWhereClause> idNotEqualTo(
+      Id id) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(
-              IdWhereClause.lessThan(
-                  upper: id_transaccion, includeUpper: false),
+              IdWhereClause.lessThan(upper: id, includeUpper: false),
             )
             .addWhereClause(
-              IdWhereClause.greaterThan(
-                  lower: id_transaccion, includeLower: false),
+              IdWhereClause.greaterThan(lower: id, includeLower: false),
             );
       } else {
         return query
             .addWhereClause(
-              IdWhereClause.greaterThan(
-                  lower: id_transaccion, includeLower: false),
+              IdWhereClause.greaterThan(lower: id, includeLower: false),
             )
             .addWhereClause(
-              IdWhereClause.lessThan(
-                  upper: id_transaccion, includeUpper: false),
+              IdWhereClause.lessThan(upper: id, includeUpper: false),
             );
       }
     });
   }
 
-  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
-      id_transaccionGreaterThan(Id id_transaccion, {bool include = false}) {
+  QueryBuilder<transaccion, transaccion, QAfterWhereClause> idGreaterThan(Id id,
+      {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
-        IdWhereClause.greaterThan(lower: id_transaccion, includeLower: include),
+        IdWhereClause.greaterThan(lower: id, includeLower: include),
       );
     });
   }
 
-  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
-      id_transaccionLessThan(Id id_transaccion, {bool include = false}) {
+  QueryBuilder<transaccion, transaccion, QAfterWhereClause> idLessThan(Id id,
+      {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
-        IdWhereClause.lessThan(upper: id_transaccion, includeUpper: include),
+        IdWhereClause.lessThan(upper: id, includeUpper: include),
       );
     });
   }
 
-  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
-      id_transaccionBetween(
-    Id lowerId_transaccion,
-    Id upperId_transaccion, {
+  QueryBuilder<transaccion, transaccion, QAfterWhereClause> idBetween(
+    Id lowerId,
+    Id upperId, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IdWhereClause.between(
-        lower: lowerId_transaccion,
+        lower: lowerId,
         includeLower: includeLower,
-        upper: upperId_transaccion,
+        upper: upperId,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
+      id_transaccionIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'id_transaccion',
+        value: [null],
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
+      id_transaccionIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'id_transaccion',
+        lower: [null],
+        includeLower: false,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
+      id_transaccionEqualTo(int? id_transaccion) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'id_transaccion',
+        value: [id_transaccion],
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
+      id_transaccionNotEqualTo(int? id_transaccion) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'id_transaccion',
+              lower: [],
+              upper: [id_transaccion],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'id_transaccion',
+              lower: [id_transaccion],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'id_transaccion',
+              lower: [id_transaccion],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'id_transaccion',
+              lower: [],
+              upper: [id_transaccion],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
+      id_transaccionGreaterThan(
+    int? id_transaccion, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'id_transaccion',
+        lower: [id_transaccion],
+        includeLower: include,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
+      id_transaccionLessThan(
+    int? id_transaccion, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'id_transaccion',
+        lower: [],
+        upper: [id_transaccion],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
+      id_transaccionBetween(
+    int? lowerId_transaccion,
+    int? upperId_transaccion, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'id_transaccion',
+        lower: [lowerId_transaccion],
+        includeLower: includeLower,
+        upper: [upperId_transaccion],
         includeUpper: includeUpper,
       ));
     });
@@ -527,8 +724,79 @@ extension transaccionQueryFilter
     });
   }
 
+  QueryBuilder<transaccion, transaccion, QAfterFilterCondition> idEqualTo(
+      Id value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'id',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterFilterCondition> idGreaterThan(
+    Id value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'id',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterFilterCondition> idLessThan(
+    Id value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'id',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterFilterCondition> idBetween(
+    Id lower,
+    Id upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'id',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<transaccion, transaccion, QAfterFilterCondition>
-      id_transaccionEqualTo(Id value) {
+      id_transaccionIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'id_transaccion',
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterFilterCondition>
+      id_transaccionIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'id_transaccion',
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterFilterCondition>
+      id_transaccionEqualTo(int? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'id_transaccion',
@@ -539,7 +807,7 @@ extension transaccionQueryFilter
 
   QueryBuilder<transaccion, transaccion, QAfterFilterCondition>
       id_transaccionGreaterThan(
-    Id value, {
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -553,7 +821,7 @@ extension transaccionQueryFilter
 
   QueryBuilder<transaccion, transaccion, QAfterFilterCondition>
       id_transaccionLessThan(
-    Id value, {
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -567,8 +835,8 @@ extension transaccionQueryFilter
 
   QueryBuilder<transaccion, transaccion, QAfterFilterCondition>
       id_transaccionBetween(
-    Id lower,
-    Id upper, {
+    int? lower,
+    int? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -779,6 +1047,19 @@ extension transaccionQuerySortBy
     });
   }
 
+  QueryBuilder<transaccion, transaccion, QAfterSortBy> sortById_transaccion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'id_transaccion', Sort.asc);
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterSortBy>
+      sortById_transaccionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'id_transaccion', Sort.desc);
+    });
+  }
+
   QueryBuilder<transaccion, transaccion, QAfterSortBy> sortByMonto() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'monto', Sort.asc);
@@ -815,6 +1096,18 @@ extension transaccionQuerySortThenBy
   QueryBuilder<transaccion, transaccion, QAfterSortBy> thenByFechaDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'fecha', Sort.desc);
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterSortBy> thenById() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'id', Sort.asc);
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterSortBy> thenByIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'id', Sort.desc);
     });
   }
 
@@ -860,6 +1153,12 @@ extension transaccionQueryWhereDistinct
     });
   }
 
+  QueryBuilder<transaccion, transaccion, QDistinct> distinctById_transaccion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'id_transaccion');
+    });
+  }
+
   QueryBuilder<transaccion, transaccion, QDistinct> distinctByMonto(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -870,9 +1169,9 @@ extension transaccionQueryWhereDistinct
 
 extension transaccionQueryProperty
     on QueryBuilder<transaccion, transaccion, QQueryProperty> {
-  QueryBuilder<transaccion, int, QQueryOperations> id_transaccionProperty() {
+  QueryBuilder<transaccion, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'id_transaccion');
+      return query.addPropertyName(r'id');
     });
   }
 
@@ -885,6 +1184,12 @@ extension transaccionQueryProperty
   QueryBuilder<transaccion, String?, QQueryOperations> fechaProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'fecha');
+    });
+  }
+
+  QueryBuilder<transaccion, int?, QQueryOperations> id_transaccionProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'id_transaccion');
     });
   }
 

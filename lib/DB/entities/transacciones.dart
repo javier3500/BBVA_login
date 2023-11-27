@@ -4,13 +4,12 @@ part 'transacciones.g.dart';
 
 @collection 
 class transaccion {
-  Id id_transaccion = Isar.autoIncrement;
-
+  Id id = Isar.autoIncrement;
   String? fecha;
   String? monto;
   String? concepto;
   @Index(unique: true, name: 'id_transaccion')
-
+  int? id_transaccion = Isar.autoIncrement;
 
   final Id_cliente = IsarLink<cliente>();
 }

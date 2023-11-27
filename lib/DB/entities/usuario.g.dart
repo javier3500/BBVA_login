@@ -17,18 +17,13 @@ const UsuarioSchema = CollectionSchema(
   name: r'usuario',
   id: 5509211092415108114,
   properties: {
-    r'Id_usuario': PropertySchema(
-      id: 0,
-      name: r'Id_usuario',
-      type: IsarType.long,
-    ),
     r'contrasena': PropertySchema(
-      id: 1,
+      id: 0,
       name: r'contrasena',
       type: IsarType.string,
     ),
     r'nombre_usuario': PropertySchema(
-      id: 2,
+      id: 1,
       name: r'nombre_usuario',
       type: IsarType.string,
     )
@@ -38,21 +33,7 @@ const UsuarioSchema = CollectionSchema(
   deserialize: _usuarioDeserialize,
   deserializeProp: _usuarioDeserializeProp,
   idName: r'id',
-  indexes: {
-    r'Id_usuario': IndexSchema(
-      id: 3508711034118398191,
-      name: r'Id_usuario',
-      unique: true,
-      replace: false,
-      properties: [
-        IndexPropertySchema(
-          name: r'Id_usuario',
-          type: IndexType.value,
-          caseSensitive: false,
-        )
-      ],
-    )
-  },
+  indexes: {},
   links: {
     r'Id_cliente': LinkSchema(
       id: -3595211721418575144,
@@ -95,9 +76,8 @@ void _usuarioSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeLong(offsets[0], object.Id_usuario);
-  writer.writeString(offsets[1], object.contrasena);
-  writer.writeString(offsets[2], object.nombre_usuario);
+  writer.writeString(offsets[0], object.contrasena);
+  writer.writeString(offsets[1], object.nombre_usuario);
 }
 
 usuario _usuarioDeserialize(
@@ -107,10 +87,9 @@ usuario _usuarioDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = usuario();
-  object.Id_usuario = reader.readLongOrNull(offsets[0]);
-  object.contrasena = reader.readStringOrNull(offsets[1]);
+  object.contrasena = reader.readStringOrNull(offsets[0]);
   object.id = id;
-  object.nombre_usuario = reader.readStringOrNull(offsets[2]);
+  object.nombre_usuario = reader.readStringOrNull(offsets[1]);
   return object;
 }
 
@@ -122,10 +101,8 @@ P _usuarioDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readLongOrNull(offset)) as P;
-    case 1:
       return (reader.readStringOrNull(offset)) as P;
-    case 2:
+    case 1:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -146,73 +123,10 @@ void _usuarioAttach(IsarCollection<dynamic> col, Id id, usuario object) {
       col, col.isar.collection<cliente>(), r'Id_cliente', id);
 }
 
-extension usuarioByIndex on IsarCollection<usuario> {
-  Future<usuario?> getById_usuario(int? Id_usuario) {
-    return getByIndex(r'Id_usuario', [Id_usuario]);
-  }
-
-  usuario? getById_usuarioSync(int? Id_usuario) {
-    return getByIndexSync(r'Id_usuario', [Id_usuario]);
-  }
-
-  Future<bool> deleteById_usuario(int? Id_usuario) {
-    return deleteByIndex(r'Id_usuario', [Id_usuario]);
-  }
-
-  bool deleteById_usuarioSync(int? Id_usuario) {
-    return deleteByIndexSync(r'Id_usuario', [Id_usuario]);
-  }
-
-  Future<List<usuario?>> getAllById_usuario(List<int?> Id_usuarioValues) {
-    final values = Id_usuarioValues.map((e) => [e]).toList();
-    return getAllByIndex(r'Id_usuario', values);
-  }
-
-  List<usuario?> getAllById_usuarioSync(List<int?> Id_usuarioValues) {
-    final values = Id_usuarioValues.map((e) => [e]).toList();
-    return getAllByIndexSync(r'Id_usuario', values);
-  }
-
-  Future<int> deleteAllById_usuario(List<int?> Id_usuarioValues) {
-    final values = Id_usuarioValues.map((e) => [e]).toList();
-    return deleteAllByIndex(r'Id_usuario', values);
-  }
-
-  int deleteAllById_usuarioSync(List<int?> Id_usuarioValues) {
-    final values = Id_usuarioValues.map((e) => [e]).toList();
-    return deleteAllByIndexSync(r'Id_usuario', values);
-  }
-
-  Future<Id> putById_usuario(usuario object) {
-    return putByIndex(r'Id_usuario', object);
-  }
-
-  Id putById_usuarioSync(usuario object, {bool saveLinks = true}) {
-    return putByIndexSync(r'Id_usuario', object, saveLinks: saveLinks);
-  }
-
-  Future<List<Id>> putAllById_usuario(List<usuario> objects) {
-    return putAllByIndex(r'Id_usuario', objects);
-  }
-
-  List<Id> putAllById_usuarioSync(List<usuario> objects,
-      {bool saveLinks = true}) {
-    return putAllByIndexSync(r'Id_usuario', objects, saveLinks: saveLinks);
-  }
-}
-
 extension usuarioQueryWhereSort on QueryBuilder<usuario, usuario, QWhere> {
   QueryBuilder<usuario, usuario, QAfterWhere> anyId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
-    });
-  }
-
-  QueryBuilder<usuario, usuario, QAfterWhere> anyId_usuario() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        const IndexWhereClause.any(indexName: r'Id_usuario'),
-      );
     });
   }
 }
@@ -282,189 +196,10 @@ extension usuarioQueryWhere on QueryBuilder<usuario, usuario, QWhereClause> {
       ));
     });
   }
-
-  QueryBuilder<usuario, usuario, QAfterWhereClause> id_usuarioIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'Id_usuario',
-        value: [null],
-      ));
-    });
-  }
-
-  QueryBuilder<usuario, usuario, QAfterWhereClause> id_usuarioIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'Id_usuario',
-        lower: [null],
-        includeLower: false,
-        upper: [],
-      ));
-    });
-  }
-
-  QueryBuilder<usuario, usuario, QAfterWhereClause> id_usuarioEqualTo(
-      int? Id_usuario) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'Id_usuario',
-        value: [Id_usuario],
-      ));
-    });
-  }
-
-  QueryBuilder<usuario, usuario, QAfterWhereClause> id_usuarioNotEqualTo(
-      int? Id_usuario) {
-    return QueryBuilder.apply(this, (query) {
-      if (query.whereSort == Sort.asc) {
-        return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'Id_usuario',
-              lower: [],
-              upper: [Id_usuario],
-              includeUpper: false,
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'Id_usuario',
-              lower: [Id_usuario],
-              includeLower: false,
-              upper: [],
-            ));
-      } else {
-        return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'Id_usuario',
-              lower: [Id_usuario],
-              includeLower: false,
-              upper: [],
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'Id_usuario',
-              lower: [],
-              upper: [Id_usuario],
-              includeUpper: false,
-            ));
-      }
-    });
-  }
-
-  QueryBuilder<usuario, usuario, QAfterWhereClause> id_usuarioGreaterThan(
-    int? Id_usuario, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'Id_usuario',
-        lower: [Id_usuario],
-        includeLower: include,
-        upper: [],
-      ));
-    });
-  }
-
-  QueryBuilder<usuario, usuario, QAfterWhereClause> id_usuarioLessThan(
-    int? Id_usuario, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'Id_usuario',
-        lower: [],
-        upper: [Id_usuario],
-        includeUpper: include,
-      ));
-    });
-  }
-
-  QueryBuilder<usuario, usuario, QAfterWhereClause> id_usuarioBetween(
-    int? lowerId_usuario,
-    int? upperId_usuario, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'Id_usuario',
-        lower: [lowerId_usuario],
-        includeLower: includeLower,
-        upper: [upperId_usuario],
-        includeUpper: includeUpper,
-      ));
-    });
-  }
 }
 
 extension usuarioQueryFilter
     on QueryBuilder<usuario, usuario, QFilterCondition> {
-  QueryBuilder<usuario, usuario, QAfterFilterCondition> id_usuarioIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'Id_usuario',
-      ));
-    });
-  }
-
-  QueryBuilder<usuario, usuario, QAfterFilterCondition> id_usuarioIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'Id_usuario',
-      ));
-    });
-  }
-
-  QueryBuilder<usuario, usuario, QAfterFilterCondition> id_usuarioEqualTo(
-      int? value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'Id_usuario',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<usuario, usuario, QAfterFilterCondition> id_usuarioGreaterThan(
-    int? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'Id_usuario',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<usuario, usuario, QAfterFilterCondition> id_usuarioLessThan(
-    int? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'Id_usuario',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<usuario, usuario, QAfterFilterCondition> id_usuarioBetween(
-    int? lower,
-    int? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'Id_usuario',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
-    });
-  }
-
   QueryBuilder<usuario, usuario, QAfterFilterCondition> contrasenaIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -835,18 +570,6 @@ extension usuarioQueryLinks
 }
 
 extension usuarioQuerySortBy on QueryBuilder<usuario, usuario, QSortBy> {
-  QueryBuilder<usuario, usuario, QAfterSortBy> sortById_usuario() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'Id_usuario', Sort.asc);
-    });
-  }
-
-  QueryBuilder<usuario, usuario, QAfterSortBy> sortById_usuarioDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'Id_usuario', Sort.desc);
-    });
-  }
-
   QueryBuilder<usuario, usuario, QAfterSortBy> sortByContrasena() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'contrasena', Sort.asc);
@@ -874,18 +597,6 @@ extension usuarioQuerySortBy on QueryBuilder<usuario, usuario, QSortBy> {
 
 extension usuarioQuerySortThenBy
     on QueryBuilder<usuario, usuario, QSortThenBy> {
-  QueryBuilder<usuario, usuario, QAfterSortBy> thenById_usuario() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'Id_usuario', Sort.asc);
-    });
-  }
-
-  QueryBuilder<usuario, usuario, QAfterSortBy> thenById_usuarioDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'Id_usuario', Sort.desc);
-    });
-  }
-
   QueryBuilder<usuario, usuario, QAfterSortBy> thenByContrasena() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'contrasena', Sort.asc);
@@ -925,12 +636,6 @@ extension usuarioQuerySortThenBy
 
 extension usuarioQueryWhereDistinct
     on QueryBuilder<usuario, usuario, QDistinct> {
-  QueryBuilder<usuario, usuario, QDistinct> distinctById_usuario() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'Id_usuario');
-    });
-  }
-
   QueryBuilder<usuario, usuario, QDistinct> distinctByContrasena(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -952,12 +657,6 @@ extension usuarioQueryProperty
   QueryBuilder<usuario, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
-    });
-  }
-
-  QueryBuilder<usuario, int?, QQueryOperations> Id_usuarioProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'Id_usuario');
     });
   }
 

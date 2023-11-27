@@ -1,5 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'main.dart';
+
+//base de datos
+import 'package:isar/isar.dart';
+import 'package:login_session/DB/isar.dart';
+
+//entidades
+import 'package:login_session/DB/entities/cliente.dart';
+import 'package:login_session/DB/entities/usuario.dart';
 
 class RegistrationPage extends StatefulWidget {
   @override
@@ -7,10 +16,15 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
+
+  static final TextEditingController _usernameController = TextEditingController();
+  static final TextEditingController _passwordController = TextEditingController();
+
+  static final TextEditingController _emailController = TextEditingController();
+  static final TextEditingController _addressController = TextEditingController();
+  static final TextEditingController _CURPController= TextEditingController();
+  static final TextEditingController _NameController = TextEditingController();
+  static final TextEditingController _CelController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -81,19 +95,51 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ),
               ),
             ),
+             SizedBox(height: 16),
+            TextField(
+              controller: _CURPController,
+              decoration: InputDecoration(
+                labelText: 'CURP',
+                prefixIcon: Icon(Icons.text_format_sharp),
+                filled: true,
+                fillColor: Colors.grey[200], // Gris claro
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+             SizedBox(height: 16),
+            TextField(
+              controller: _NameController,
+              decoration: InputDecoration(
+                labelText: 'Nombre completo',
+                prefixIcon: Icon(Icons.text_format),
+                filled: true,
+                fillColor: Colors.grey[200], // Gris claro
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+             SizedBox(height: 16),
+            TextField(
+              controller: _CelController,
+              decoration: InputDecoration(
+                labelText: 'Telefóno',
+                prefixIcon: Icon(Icons.phone),
+                filled: true,
+                fillColor: Colors.grey[200], // Gris claro
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
             SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () {
-                // cifrado en base 64
-                String encodedPassword =
-                    base64.encode(utf8.encode(_passwordController.text));
-
-                // Print the registration data to the console
-                print('Usuario: ${_usernameController.text}');
-                print('Correo Electrónico: ${_emailController.text}');
-                print('Dirección: ${_addressController.text}');
-                print('Contraseña (Base64): $encodedPassword');
-              },
+              onPressed: _RegistrationUser, 
               style: ElevatedButton.styleFrom(
                 primary: Color(0xFF0099FF), // Azul claro
                 shape: RoundedRectangleBorder(
@@ -121,4 +167,33 @@ class _RegistrationPageState extends State<RegistrationPage> {
       ),
     );
   }
+  
+  Future<void> _RegistrationUser() async {
+     final isar = IsarHelper.instance.isar;
+     final client = cliente()..nombre_completo = _NameController.text..telefono = _CelController.text..domicilio = _addressController.text..CURP = _CURPController.text..correo = _emailController.text;
+     final user = usuario()..nombre_usuario = _usernameController.text..contrasena = _passwordController.text;
+
+     try{
+         await isar.writeTxn(() async{
+            await isar.clientes.put(client);
+         });
+
+          await isar.writeTxn(() async{
+            await isar.usuarios.put(user);
+         });
+         print('usuario creado');
+     }on IsarError catch(error){
+      throw Exception(error.message);
+     }
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoginPage(),
+        ),
+    );
+  }
 }
+
+
+
+

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'TramitesTransferencia.dart';
+// import 'package:login_session/DB/entities/entities.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:login_session/blocs/blocs.dart';
 
 class Indextranferencias extends StatelessWidget {
   @override
@@ -78,6 +81,15 @@ class Indextranferencias extends StatelessWidget {
                       color: Color(0xFF003366), // Azul oscuro
                     ),
                   ),
+                  // Expanded(
+                  //   child: ListView.separated(
+                  //     itemBuilder: (context, index){
+                  //       return TransferenciaItem ();
+                  //     },
+                  //     separatorBuilder: (context, index) => const Divider(),
+                  //     itemCount: 5,
+                  //   ),
+                  // ),
                   SizedBox(height: 12),
                   TransferenciaItem(
                     fecha: '10/11/2023',
@@ -103,6 +115,8 @@ class Indextranferencias extends StatelessWidget {
     );
   }
 }
+
+
 
 class TransferenciaItem extends StatelessWidget {
   final String fecha;
