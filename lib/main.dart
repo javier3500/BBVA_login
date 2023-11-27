@@ -202,5 +202,6 @@ class _LoginPageState extends State<LoginPage> {
  final isar = IsarHelper.instance.isar;
  Future<List<usuario>> verificar(String nombre, String pass) async {
      return isar.usuarios.where().findAll();
+     //hola
   }
 }
