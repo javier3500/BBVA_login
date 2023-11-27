@@ -198,15 +198,9 @@ class _LoginPageState extends State<LoginPage> {
     //   );
     // }
   }
-  
+
+ final isar = IsarHelper.instance.isar;
  Future<List<usuario>> verificar(String nombre, String pass) async {
-  print(nombre);
-    print(pass);
-    final isar = IsarHelper.instance.isar;
-     return isar.usuarios.filter()
-    .nombre_usuarioContains(nombre)
-    .and()
-    .contrasenaContains(pass)
-    .findAll();
- }
+     return isar.usuarios.where().findAll();
+  }
 }
