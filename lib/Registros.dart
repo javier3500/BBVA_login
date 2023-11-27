@@ -1,5 +1,6 @@
-import 'dart:convert';
+//import 'dart:convert';
 import 'package:flutter/material.dart';
+//import 'package:flutter/material.dart';
 import 'main.dart';
 
 //base de datos
@@ -171,7 +172,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Future<void> _RegistrationUser() async {
      final isar = IsarHelper.instance.isar;
      final client = cliente()..nombre_completo = _NameController.text..telefono = _CelController.text..domicilio = _addressController.text..CURP = _CURPController.text..correo = _emailController.text;
-     final user = usuario()..nombre_usuario = _usernameController.text..contrasena = _passwordController.text;
+     final user = usuario()..nombre_usuario = _usernameController.text..contrasena = _passwordController.text..correo =  _emailController.text;
 
      try{
          await isar.writeTxn(() async{

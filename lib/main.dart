@@ -1,5 +1,7 @@
 // main.dart
 
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'dart:convert'; // Importar la librería necesaria para Base64
 import 'Tranferencias/indextranferencias.dart';
@@ -175,19 +177,21 @@ class _LoginPageState extends State<LoginPage> {
     // print(_usernameController.text);
     // Lógica para iniciar sesión
 
-    bool autenticado = await verificarYAutenticar(
-        _usernameController.text, _passwordController.text);
+    List<usuario> autenticado = await verificarYAutenticar(_usernameController.text, _passwordController.text);
+    
 
-    if (autenticado) {
-      // Si las credenciales son correctas, redirige a la vista Indextranferencias
-      Navigator.push(
+     if (autenticado.isNotEmpty) {
+       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => Indextranferencias(),
+          builder: (context) => Indextranferencias(
+            //pasamos los parametros a indextransferencias
+            autenticado[0].nombre_usuario,
+            autenticado[0].correo,
+          ),
         ),
       );
     } else {
-      // Muestra un mensaje de error si las credenciales son incorrectas
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Usuario o contraseña incorrectos'),
@@ -195,50 +199,33 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     }
+
+    // if (autenticado) {
+    //   // Si las credenciales son correctas, redirige a la vista Indextranferencias
+     
+    // } else {
+    //   // Muestra un mensaje de error si las credenciales son incorrectas
+      
+    // }
   }
 
-  final isar = IsarHelper.instance.isar;
-  // Future<void> verificarYImprimir(String nombre, String pass) async {
-  //   print('Nombre: $nombre');
-  //   print('Contraseña: $pass');
-
-  //   final usuarios = await isar.usuarios.where().findAll();
-  //   print(usuarios);
-
-  //   if (usuarios.isNotEmpty) {
-  //     print('Usuario autenticado');
-  //     for (final usuario in usuarios) {
-  //       print(
-  //           'ID: ${usuario.id}, Nombre: ${usuario.nombre_usuario}, Contraseña: ${usuario.contrasena}');
-  //     }
-  //   } else {
-  //     print('Usuario no autenticado');
-  //   }
-  // }
-
-  Future<bool> verificarYAutenticar(String nombre, String pass) async {
-    print('Nombre: $nombre');
-    print('Contraseña: $pass');
-
+  final isar = IsarHelper.instance.isar;//conexión a base de
+ 
+  Future<List<usuario>> verificarYAutenticar(String nombre, String pass) async {
     final usuarios = await isar.usuarios
         .filter()
         .nombre_usuarioEqualTo(nombre, caseSensitive: false)
         .and()
         .contrasenaEqualTo(pass)
         .findAll();
-
-    print(usuarios);
-
-    if (usuarios.isNotEmpty) {
-      print('Usuario autenticado');
-      for (final usuario in usuarios) {
-        print(
-            'ID: ${usuario.id}, Nombre: ${usuario.nombre_usuario}, Contraseña: ${usuario.contrasena}');
-      }
-      return true; // Usuario autenticado
-    } else {
-      print('Usuario no autenticado');
-      return false; // Usuario no autenticado
-    }
+   
+      return usuarios; // Usuario autenticado
   }
+}
+
+class usuarioverificado {
+  String? nombre_usuario;
+  String? correo;
+
+  usuarioverificado(this.nombre_usuario, this.correo);
 }

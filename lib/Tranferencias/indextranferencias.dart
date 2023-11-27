@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:login_session/main.dart';
 import 'TramitesTransferencia.dart';
+
+//entidades
+import 'package:login_session/DB/entities/cliente.dart';
+import 'package:login_session/DB/entities/usuario.dart';
 // import 'package:login_session/DB/entities/entities.dart';
 // import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:login_session/blocs/blocs.dart';
 
 class Indextranferencias extends StatelessWidget {
+  String? user_name;
+  String? correo;
+
+  Indextranferencias(this.user_name, this.correo);
+
+  
   @override
   Widget build(BuildContext context) {
+    print(this.user_name);//verificamos que si esta pasando los datos
+      
     return Scaffold(
       appBar: AppBar(
         title: Text('Bienvenido'),
@@ -54,7 +67,7 @@ class Indextranferencias extends StatelessWidget {
             SizedBox(height: 16),
             // Nombre de usuario
             Text(
-              'Javier',
+              '${this.user_name}',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -115,6 +128,7 @@ class Indextranferencias extends StatelessWidget {
     );
   }
 }
+
 
 
 

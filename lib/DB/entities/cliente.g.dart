@@ -68,15 +68,7 @@ const ClienteSchema = CollectionSchema(
       ],
     )
   },
-  links: {
-    r'Id_cliente': LinkSchema(
-      id: 5295433177058579148,
-      name: r'Id_cliente',
-      target: r'usuario',
-      single: false,
-      linkName: r'Id_cliente',
-    )
-  },
+  links: {},
   embeddedSchemas: {},
   getId: _clienteGetId,
   getLinks: _clienteGetLinks,
@@ -183,13 +175,11 @@ Id _clienteGetId(cliente object) {
 }
 
 List<IsarLinkBase<dynamic>> _clienteGetLinks(cliente object) {
-  return [object.Id_cliente];
+  return [];
 }
 
 void _clienteAttach(IsarCollection<dynamic> col, Id id, cliente object) {
   object.id = id;
-  object.Id_cliente.attach(
-      col, col.isar.collection<usuario>(), r'Id_cliente', id);
 }
 
 extension clienteByIndex on IsarCollection<cliente> {
@@ -1250,65 +1240,7 @@ extension clienteQueryObject
     on QueryBuilder<cliente, cliente, QFilterCondition> {}
 
 extension clienteQueryLinks
-    on QueryBuilder<cliente, cliente, QFilterCondition> {
-  QueryBuilder<cliente, cliente, QAfterFilterCondition> id_cliente(
-      FilterQuery<usuario> q) {
-    return QueryBuilder.apply(this, (query) {
-      return query.link(q, r'Id_cliente');
-    });
-  }
-
-  QueryBuilder<cliente, cliente, QAfterFilterCondition> id_clienteLengthEqualTo(
-      int length) {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'Id_cliente', length, true, length, true);
-    });
-  }
-
-  QueryBuilder<cliente, cliente, QAfterFilterCondition> id_clienteIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'Id_cliente', 0, true, 0, true);
-    });
-  }
-
-  QueryBuilder<cliente, cliente, QAfterFilterCondition> id_clienteIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'Id_cliente', 0, false, 999999, true);
-    });
-  }
-
-  QueryBuilder<cliente, cliente, QAfterFilterCondition>
-      id_clienteLengthLessThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'Id_cliente', 0, true, length, include);
-    });
-  }
-
-  QueryBuilder<cliente, cliente, QAfterFilterCondition>
-      id_clienteLengthGreaterThan(
-    int length, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'Id_cliente', length, include, 999999, true);
-    });
-  }
-
-  QueryBuilder<cliente, cliente, QAfterFilterCondition> id_clienteLengthBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(
-          r'Id_cliente', lower, includeLower, upper, includeUpper);
-    });
-  }
-}
+    on QueryBuilder<cliente, cliente, QFilterCondition> {}
 
 extension clienteQuerySortBy on QueryBuilder<cliente, cliente, QSortBy> {
   QueryBuilder<cliente, cliente, QAfterSortBy> sortByCURP() {

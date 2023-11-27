@@ -10,9 +10,6 @@ class usuario {
   String? nombre_usuario;
   String? contrasena;
   
-
-  @Index(unique: true, name: 'id')
-
-  
-  final Id_cliente = IsarLink<cliente>();
+  @Index(unique: true, name: 'correo')
+  String? correo;
 }

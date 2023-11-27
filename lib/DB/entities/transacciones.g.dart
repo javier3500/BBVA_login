@@ -22,15 +22,15 @@ const TransaccionSchema = CollectionSchema(
       name: r'concepto',
       type: IsarType.string,
     ),
-    r'fecha': PropertySchema(
+    r'correo': PropertySchema(
       id: 1,
-      name: r'fecha',
+      name: r'correo',
       type: IsarType.string,
     ),
-    r'id_transaccion': PropertySchema(
+    r'fecha': PropertySchema(
       id: 2,
-      name: r'id_transaccion',
-      type: IsarType.long,
+      name: r'fecha',
+      type: IsarType.string,
     ),
     r'monto': PropertySchema(
       id: 3,
@@ -43,29 +43,8 @@ const TransaccionSchema = CollectionSchema(
   deserialize: _transaccionDeserialize,
   deserializeProp: _transaccionDeserializeProp,
   idName: r'id',
-  indexes: {
-    r'id_transaccion': IndexSchema(
-      id: 902735842365838151,
-      name: r'id_transaccion',
-      unique: true,
-      replace: false,
-      properties: [
-        IndexPropertySchema(
-          name: r'id_transaccion',
-          type: IndexType.value,
-          caseSensitive: false,
-        )
-      ],
-    )
-  },
-  links: {
-    r'Id_cliente': LinkSchema(
-      id: 6310084906718950114,
-      name: r'Id_cliente',
-      target: r'cliente',
-      single: true,
-    )
-  },
+  indexes: {},
+  links: {},
   embeddedSchemas: {},
   getId: _transaccionGetId,
   getLinks: _transaccionGetLinks,
@@ -81,6 +60,12 @@ int _transaccionEstimateSize(
   var bytesCount = offsets.last;
   {
     final value = object.concepto;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.correo;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
     }
@@ -107,8 +92,8 @@ void _transaccionSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.concepto);
-  writer.writeString(offsets[1], object.fecha);
-  writer.writeLong(offsets[2], object.id_transaccion);
+  writer.writeString(offsets[1], object.correo);
+  writer.writeString(offsets[2], object.fecha);
   writer.writeString(offsets[3], object.monto);
 }
 
@@ -120,9 +105,9 @@ transaccion _transaccionDeserialize(
 ) {
   final object = transaccion();
   object.concepto = reader.readStringOrNull(offsets[0]);
-  object.fecha = reader.readStringOrNull(offsets[1]);
+  object.correo = reader.readStringOrNull(offsets[1]);
+  object.fecha = reader.readStringOrNull(offsets[2]);
   object.id = id;
-  object.id_transaccion = reader.readLongOrNull(offsets[2]);
   object.monto = reader.readStringOrNull(offsets[3]);
   return object;
 }
@@ -139,7 +124,7 @@ P _transaccionDeserializeProp<P>(
     case 1:
       return (reader.readStringOrNull(offset)) as P;
     case 2:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 3:
       return (reader.readStringOrNull(offset)) as P;
     default:
@@ -152,71 +137,12 @@ Id _transaccionGetId(transaccion object) {
 }
 
 List<IsarLinkBase<dynamic>> _transaccionGetLinks(transaccion object) {
-  return [object.Id_cliente];
+  return [];
 }
 
 void _transaccionAttach(
     IsarCollection<dynamic> col, Id id, transaccion object) {
   object.id = id;
-  object.Id_cliente.attach(
-      col, col.isar.collection<cliente>(), r'Id_cliente', id);
-}
-
-extension transaccionByIndex on IsarCollection<transaccion> {
-  Future<transaccion?> getById_transaccion(int? id_transaccion) {
-    return getByIndex(r'id_transaccion', [id_transaccion]);
-  }
-
-  transaccion? getById_transaccionSync(int? id_transaccion) {
-    return getByIndexSync(r'id_transaccion', [id_transaccion]);
-  }
-
-  Future<bool> deleteById_transaccion(int? id_transaccion) {
-    return deleteByIndex(r'id_transaccion', [id_transaccion]);
-  }
-
-  bool deleteById_transaccionSync(int? id_transaccion) {
-    return deleteByIndexSync(r'id_transaccion', [id_transaccion]);
-  }
-
-  Future<List<transaccion?>> getAllById_transaccion(
-      List<int?> id_transaccionValues) {
-    final values = id_transaccionValues.map((e) => [e]).toList();
-    return getAllByIndex(r'id_transaccion', values);
-  }
-
-  List<transaccion?> getAllById_transaccionSync(
-      List<int?> id_transaccionValues) {
-    final values = id_transaccionValues.map((e) => [e]).toList();
-    return getAllByIndexSync(r'id_transaccion', values);
-  }
-
-  Future<int> deleteAllById_transaccion(List<int?> id_transaccionValues) {
-    final values = id_transaccionValues.map((e) => [e]).toList();
-    return deleteAllByIndex(r'id_transaccion', values);
-  }
-
-  int deleteAllById_transaccionSync(List<int?> id_transaccionValues) {
-    final values = id_transaccionValues.map((e) => [e]).toList();
-    return deleteAllByIndexSync(r'id_transaccion', values);
-  }
-
-  Future<Id> putById_transaccion(transaccion object) {
-    return putByIndex(r'id_transaccion', object);
-  }
-
-  Id putById_transaccionSync(transaccion object, {bool saveLinks = true}) {
-    return putByIndexSync(r'id_transaccion', object, saveLinks: saveLinks);
-  }
-
-  Future<List<Id>> putAllById_transaccion(List<transaccion> objects) {
-    return putAllByIndex(r'id_transaccion', objects);
-  }
-
-  List<Id> putAllById_transaccionSync(List<transaccion> objects,
-      {bool saveLinks = true}) {
-    return putAllByIndexSync(r'id_transaccion', objects, saveLinks: saveLinks);
-  }
 }
 
 extension transaccionQueryWhereSort
@@ -224,14 +150,6 @@ extension transaccionQueryWhereSort
   QueryBuilder<transaccion, transaccion, QAfterWhere> anyId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QAfterWhere> anyId_transaccion() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        const IndexWhereClause.any(indexName: r'id_transaccion'),
-      );
     });
   }
 }
@@ -299,121 +217,6 @@ extension transaccionQueryWhere
         lower: lowerId,
         includeLower: includeLower,
         upper: upperId,
-        includeUpper: includeUpper,
-      ));
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
-      id_transaccionIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'id_transaccion',
-        value: [null],
-      ));
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
-      id_transaccionIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'id_transaccion',
-        lower: [null],
-        includeLower: false,
-        upper: [],
-      ));
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
-      id_transaccionEqualTo(int? id_transaccion) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'id_transaccion',
-        value: [id_transaccion],
-      ));
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
-      id_transaccionNotEqualTo(int? id_transaccion) {
-    return QueryBuilder.apply(this, (query) {
-      if (query.whereSort == Sort.asc) {
-        return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'id_transaccion',
-              lower: [],
-              upper: [id_transaccion],
-              includeUpper: false,
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'id_transaccion',
-              lower: [id_transaccion],
-              includeLower: false,
-              upper: [],
-            ));
-      } else {
-        return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'id_transaccion',
-              lower: [id_transaccion],
-              includeLower: false,
-              upper: [],
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'id_transaccion',
-              lower: [],
-              upper: [id_transaccion],
-              includeUpper: false,
-            ));
-      }
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
-      id_transaccionGreaterThan(
-    int? id_transaccion, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'id_transaccion',
-        lower: [id_transaccion],
-        includeLower: include,
-        upper: [],
-      ));
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
-      id_transaccionLessThan(
-    int? id_transaccion, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'id_transaccion',
-        lower: [],
-        upper: [id_transaccion],
-        includeUpper: include,
-      ));
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QAfterWhereClause>
-      id_transaccionBetween(
-    int? lowerId_transaccion,
-    int? upperId_transaccion, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'id_transaccion',
-        lower: [lowerId_transaccion],
-        includeLower: includeLower,
-        upper: [upperId_transaccion],
         includeUpper: includeUpper,
       ));
     });
@@ -570,6 +373,157 @@ extension transaccionQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'concepto',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterFilterCondition> correoIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'correo',
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterFilterCondition>
+      correoIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'correo',
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterFilterCondition> correoEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'correo',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterFilterCondition>
+      correoGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'correo',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterFilterCondition> correoLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'correo',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterFilterCondition> correoBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'correo',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterFilterCondition>
+      correoStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'correo',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterFilterCondition> correoEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'correo',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterFilterCondition> correoContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'correo',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterFilterCondition> correoMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'correo',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterFilterCondition>
+      correoIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'correo',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterFilterCondition>
+      correoIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'correo',
         value: '',
       ));
     });
@@ -777,80 +731,6 @@ extension transaccionQueryFilter
     });
   }
 
-  QueryBuilder<transaccion, transaccion, QAfterFilterCondition>
-      id_transaccionIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'id_transaccion',
-      ));
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QAfterFilterCondition>
-      id_transaccionIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'id_transaccion',
-      ));
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QAfterFilterCondition>
-      id_transaccionEqualTo(int? value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'id_transaccion',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QAfterFilterCondition>
-      id_transaccionGreaterThan(
-    int? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'id_transaccion',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QAfterFilterCondition>
-      id_transaccionLessThan(
-    int? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'id_transaccion',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QAfterFilterCondition>
-      id_transaccionBetween(
-    int? lower,
-    int? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'id_transaccion',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
-    });
-  }
-
   QueryBuilder<transaccion, transaccion, QAfterFilterCondition> montoIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -1005,21 +885,7 @@ extension transaccionQueryObject
     on QueryBuilder<transaccion, transaccion, QFilterCondition> {}
 
 extension transaccionQueryLinks
-    on QueryBuilder<transaccion, transaccion, QFilterCondition> {
-  QueryBuilder<transaccion, transaccion, QAfterFilterCondition> id_cliente(
-      FilterQuery<cliente> q) {
-    return QueryBuilder.apply(this, (query) {
-      return query.link(q, r'Id_cliente');
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QAfterFilterCondition>
-      id_clienteIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.linkLength(r'Id_cliente', 0, true, 0, true);
-    });
-  }
-}
+    on QueryBuilder<transaccion, transaccion, QFilterCondition> {}
 
 extension transaccionQuerySortBy
     on QueryBuilder<transaccion, transaccion, QSortBy> {
@@ -1035,6 +901,18 @@ extension transaccionQuerySortBy
     });
   }
 
+  QueryBuilder<transaccion, transaccion, QAfterSortBy> sortByCorreo() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'correo', Sort.asc);
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterSortBy> sortByCorreoDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'correo', Sort.desc);
+    });
+  }
+
   QueryBuilder<transaccion, transaccion, QAfterSortBy> sortByFecha() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'fecha', Sort.asc);
@@ -1044,19 +922,6 @@ extension transaccionQuerySortBy
   QueryBuilder<transaccion, transaccion, QAfterSortBy> sortByFechaDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'fecha', Sort.desc);
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QAfterSortBy> sortById_transaccion() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'id_transaccion', Sort.asc);
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QAfterSortBy>
-      sortById_transaccionDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'id_transaccion', Sort.desc);
     });
   }
 
@@ -1087,6 +952,18 @@ extension transaccionQuerySortThenBy
     });
   }
 
+  QueryBuilder<transaccion, transaccion, QAfterSortBy> thenByCorreo() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'correo', Sort.asc);
+    });
+  }
+
+  QueryBuilder<transaccion, transaccion, QAfterSortBy> thenByCorreoDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'correo', Sort.desc);
+    });
+  }
+
   QueryBuilder<transaccion, transaccion, QAfterSortBy> thenByFecha() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'fecha', Sort.asc);
@@ -1108,19 +985,6 @@ extension transaccionQuerySortThenBy
   QueryBuilder<transaccion, transaccion, QAfterSortBy> thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QAfterSortBy> thenById_transaccion() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'id_transaccion', Sort.asc);
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QAfterSortBy>
-      thenById_transaccionDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'id_transaccion', Sort.desc);
     });
   }
 
@@ -1146,16 +1010,17 @@ extension transaccionQueryWhereDistinct
     });
   }
 
+  QueryBuilder<transaccion, transaccion, QDistinct> distinctByCorreo(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'correo', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<transaccion, transaccion, QDistinct> distinctByFecha(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'fecha', caseSensitive: caseSensitive);
-    });
-  }
-
-  QueryBuilder<transaccion, transaccion, QDistinct> distinctById_transaccion() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'id_transaccion');
     });
   }
 
@@ -1181,15 +1046,15 @@ extension transaccionQueryProperty
     });
   }
 
-  QueryBuilder<transaccion, String?, QQueryOperations> fechaProperty() {
+  QueryBuilder<transaccion, String?, QQueryOperations> correoProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'fecha');
+      return query.addPropertyName(r'correo');
     });
   }
 
-  QueryBuilder<transaccion, int?, QQueryOperations> id_transaccionProperty() {
+  QueryBuilder<transaccion, String?, QQueryOperations> fechaProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'id_transaccion');
+      return query.addPropertyName(r'fecha');
     });
   }
 
