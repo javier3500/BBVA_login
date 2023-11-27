@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert'; // Importar la librería necesaria para Base64
 import 'Tranferencias/indextranferencias.dart';
 import 'Registros.dart';
-
+import 'package:login_session/DB/entities/entities.dart';
 
 //base de datos
 import 'package:isar/isar.dart';
@@ -13,10 +13,9 @@ import 'package:login_session/DB/isar.dart';
 //entidades
 import 'package:login_session/DB/entities/usuario.dart';
 
-
 void main() async {
-   WidgetsFlutterBinding.ensureInitialized(); //Inicializar conexión
-   await IsarHelper.instance.init(); //inicializar el esquema de base de datos
+  WidgetsFlutterBinding.ensureInitialized(); //Inicializar conexión
+  await IsarHelper.instance.init(); //inicializar el esquema de base de datos
   runApp(MyApp());
 }
 
@@ -37,19 +36,19 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  
+
   get controller => null;
-  
+
   get contrasena => null;
 
-  void dispose(){
+  void dispose() {
     controller.dispose();
     super.dispose();
-
   }
+
   @override
   Widget build(BuildContext context) {
-   // final dao = UserDao();
+    // final dao = UserDao();
     return Scaffold(
       backgroundColor: Color(0xFF003366), // Azul oscuro
       body: Center(
@@ -175,33 +174,71 @@ class _LoginPageState extends State<LoginPage> {
     // print(encryptedPassword);
     // print(_usernameController.text);
     // Lógica para iniciar sesión
-  
-   final Autentico = await verificar(_usernameController.text, _passwordController.text);
-   print (Autentico);
-   print(Autentico.isEmpty);
-    
-    // if (Autentico) {
-    //   // Si las credenciales son correctas, redirige a la vista Indextranferencias
-    //   Navigator.push(
-    //     context,
-    //     MaterialPageRoute(
-    //       builder: (context) => Indextranferencias(),
-    //     ),
-    //   );
-    // } else {
-    //   // Muestra un mensaje de error si las credenciales son incorrectas
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(
-    //       content: Text('Usuario o contraseña incorrectos'),
-    //       backgroundColor: Colors.red,
-    //     ),
-    //   );
-    // }
+
+    bool autenticado = await verificarYAutenticar(
+        _usernameController.text, _passwordController.text);
+
+    if (autenticado) {
+      // Si las credenciales son correctas, redirige a la vista Indextranferencias
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Indextranferencias(),
+        ),
+      );
+    } else {
+      // Muestra un mensaje de error si las credenciales son incorrectas
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Usuario o contraseña incorrectos'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
- final isar = IsarHelper.instance.isar;
- Future<List<usuario>> verificar(String nombre, String pass) async {
-     return isar.usuarios.where().findAll();
-     //hola
+  final isar = IsarHelper.instance.isar;
+  // Future<void> verificarYImprimir(String nombre, String pass) async {
+  //   print('Nombre: $nombre');
+  //   print('Contraseña: $pass');
+
+  //   final usuarios = await isar.usuarios.where().findAll();
+  //   print(usuarios);
+
+  //   if (usuarios.isNotEmpty) {
+  //     print('Usuario autenticado');
+  //     for (final usuario in usuarios) {
+  //       print(
+  //           'ID: ${usuario.id}, Nombre: ${usuario.nombre_usuario}, Contraseña: ${usuario.contrasena}');
+  //     }
+  //   } else {
+  //     print('Usuario no autenticado');
+  //   }
+  // }
+
+  Future<bool> verificarYAutenticar(String nombre, String pass) async {
+    print('Nombre: $nombre');
+    print('Contraseña: $pass');
+
+    final usuarios = await isar.usuarios
+        .filter()
+        .nombre_usuarioEqualTo(nombre, caseSensitive: false)
+        .and()
+        .contrasenaEqualTo(pass)
+        .findAll();
+
+    print(usuarios);
+
+    if (usuarios.isNotEmpty) {
+      print('Usuario autenticado');
+      for (final usuario in usuarios) {
+        print(
+            'ID: ${usuario.id}, Nombre: ${usuario.nombre_usuario}, Contraseña: ${usuario.contrasena}');
+      }
+      return true; // Usuario autenticado
+    } else {
+      print('Usuario no autenticado');
+      return false; // Usuario no autenticado
+    }
   }
 }
