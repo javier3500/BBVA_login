@@ -5,21 +5,35 @@ import 'TramitesTransferencia.dart';
 //entidades
 import 'package:login_session/DB/entities/cliente.dart';
 import 'package:login_session/DB/entities/usuario.dart';
+import 'package:login_session/DB/entities/transacciones.dart';
 // import 'package:login_session/DB/entities/entities.dart';
 // import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:login_session/blocs/blocs.dart';
 
+//base de datos
+import 'package:isar/isar.dart';
+import 'package:login_session/DB/isar.dart';
+
+
 class Indextranferencias extends StatelessWidget {
+ 
+  
   String? user_name;
   String? correo;
+  Key? key;
+  List<transaccion> trans = [];
 
-  Indextranferencias(this.user_name, this.correo);
+  Indextranferencias(this.user_name, this.correo) {
+    //trans = listaTrans(this.correo) as List<transaccion>;
+  }
 
-  
   @override
   Widget build(BuildContext context) {
+    
     print(this.user_name);//verificamos que si esta pasando los datos
-      
+    print(this.correo);//verificamos que si esta pasando los datos
+    print(trans.isNotEmpty);
+    //<print(trans[0].concepto);
     return Scaffold(
       appBar: AppBar(
         title: Text('Bienvenido'),
@@ -94,31 +108,49 @@ class Indextranferencias extends StatelessWidget {
                       color: Color(0xFF003366), // Azul oscuro
                     ),
                   ),
+                  ListView.builder(
+                    primary: false,
+                    
+                    itemCount: 5,
+                    itemBuilder: (context, index) {
+                      //final transfe = trans[index];
+                      return ListTile(
+                        title: Text('Hola'),
+                      );
+                  
+                     }),
+                  
+
                   // Expanded(
                   //   child: ListView.separated(
+                  //     itemCount: trans.length,
                   //     itemBuilder: (context, index){
-                  //       return TransferenciaItem ();
+                  //       final transaccion = trans[index];
+                  //       return TransferenciaItem (
+                  //         fecha: transaccion.fecha,
+                  //         monto: '${transaccion.monto}',
+                  //         concepto: transaccion.concepto,
+                  //       );
                   //     },
                   //     separatorBuilder: (context, index) => const Divider(),
-                  //     itemCount: 5,
                   //   ),
                   // ),
-                  SizedBox(height: 12),
-                  TransferenciaItem(
-                    fecha: '10/11/2023',
-                    monto: '\$500.00',
-                    concepto: 'Compra en línea',
-                  ),
-                  TransferenciaItem(
-                    fecha: '09/11/2023',
-                    monto: '\$200.00',
-                    concepto: 'Almuerzo',
-                  ),
-                  TransferenciaItem(
-                    fecha: '08/11/2023',
-                    monto: '\$1000.00',
-                    concepto: 'Pago de factura',
-                  ),
+                  // SizedBox(height: 12),
+                  // TransferenciaItem(
+                  //   fecha: '10/11/2023',
+                  //   monto: '\$500.00',
+                  //   concepto: 'Compra en línea',
+                  // ),
+                  // TransferenciaItem(
+                  //   fecha: '09/11/2023',
+                  //   monto: '\$200.00',
+                  //   concepto: 'Almuerzo',
+                  // ),
+                  // TransferenciaItem(
+                  //   fecha: '08/11/2023',
+                  //   monto: '\$1000.00',
+                  //   concepto: 'Pago de factura',
+                  // ),
                 ],
               ),
             ),
@@ -129,13 +161,42 @@ class Indextranferencias extends StatelessWidget {
   }
 }
 
+Future<List<transaccion>> listaTrans (String? correo){
+  final trans = getAllTransaccion(correo);
+  return trans;
+}
 
 
+final isar = IsarHelper.instance.isar;//conexión a base de
+ Future<List<transaccion>> getAllTransaccion(String? correo) async{
+  print('hola ${correo}');
+  final listTransaccion = await isar.transaccions
+        .filter()
+        .correoEqualTo(correo, caseSensitive: false)
+        .findAll();
+
+    return listTransaccion;
+  }
+
+  void mostrar(){
+    print('Hola');
+  }
+
+  Future<List<usuario>> verificarYAutenticar(String nombre, String pass) async {
+    final usuarios = await isar.usuarios
+        .filter()
+        .nombre_usuarioEqualTo(nombre, caseSensitive: false)
+        .and()
+        .contrasenaEqualTo(pass)
+        .findAll();
+   
+      return usuarios; // Usuario autenticado
+  }
 
 class TransferenciaItem extends StatelessWidget {
-  final String fecha;
-  final String monto;
-  final String concepto;
+  String? fecha;
+  String? monto;
+  String? concepto;
 
   TransferenciaItem({
     required this.fecha,
