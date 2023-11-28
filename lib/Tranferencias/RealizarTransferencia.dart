@@ -128,50 +128,51 @@ class RealizarTransferenciaScreen extends StatelessWidget {
       int? NewsaldoCliente = cantidad1 + saldoClient!;
       print(diferencia);
       print(NewsaldoCliente);
-      //  if(diferencia >= 0){
-      //    final transac = transaccion()..fecha = '28/11/2023'..concepto = concepto..monto = cantidad..correo = correo;
-      //    await isar.writeTxn(() async{
-      //    await isar.transaccions.put(transac); 
-        
-      //     final getcliente = await isar.clientes
-      //     .filter()
-      //     .correoEqualTo(correo, caseSensitive: false)
-      //     .findAll();
+       if(diferencia >= 0){
+         final transac = transaccion()..fecha = '28/11/2023'..concepto = concepto..monto = cantidad..correo = correo;
+         
+         await isar.writeTxn(() async{
+         await isar.transaccions.put(transac); 
+         });
 
-      //     if(getcliente != null){
-      //        final client = cliente()..nombre_completo = getcliente[0].nombre_completo
-      //        .. telefono = getcliente[0].telefono
-      //        ..domicilio = getcliente[0].domicilio
-      //        ..CURP = getcliente[0].CURP
-      //        ..noCuenta = getcliente[0].noCuenta
-      //        ..correo = getcliente[0].correo
-      //        ..saldo = diferencia; 
+          final getcliente = await isar.clientes
+          .filter()
+          .correoEqualTo(correo, caseSensitive: false)
+          .findAll();
 
-      //         await isar.writeTxn(() async{
-      //         await isar.clientes.put(client);
+          if(getcliente != null){
+             final client = cliente()..nombre_completo = getcliente[0].nombre_completo
+             .. telefono = getcliente[0].telefono
+             ..domicilio = getcliente[0].domicilio
+             ..CURP = getcliente[0].CURP
+             ..noCuenta = getcliente[0].noCuenta
+             ..correo = getcliente[0].correo
+             ..saldo = diferencia; 
 
-      //          final clientTrans = cliente()
-      //          ..nombre_completo = this.nombreCliente
-      //        .. telefono = this.telefono
-      //        ..domicilio = this.domicilio
-      //        ..CURP = this.CURP
-      //        ..noCuenta = this.noCuenta
-      //        ..correo = this.correoClient
-      //        ..saldo = NewsaldoCliente; 
+              await isar.writeTxn(() async{
+              await isar.clientes.put(client);
 
-      //         await isar.writeTxn(() async{
-      //         await isar.clientes.put(clientTrans);
-      //         });
-      //       });
-      //     }else{
-      //       print('No existe el cliente');
-      //       throw Exception('Ocurrió un error personalizado');
-      //     }
-      //    });
-      //  }else{
-      //    print('se sobre pasa');
-      //    throw Exception('Ocurrió un error personalizado');
-      //  }
+               final clientTrans = cliente()
+               ..nombre_completo = this.nombreCliente
+             .. telefono = this.telefono
+             ..domicilio = this.domicilio
+             ..CURP = this.CURP
+             ..noCuenta = this.noCuenta
+             ..correo = this.correoClient
+             ..saldo = NewsaldoCliente; 
+
+              await isar.writeTxn(() async{
+              await isar.clientes.put(clientTrans);
+              });
+            });
+          }else{
+            print('No existe el cliente');
+            throw Exception('Ocurrió un error personalizado');
+          }
+       }else{
+         print('se sobre pasa');
+         throw Exception('Ocurrió un error personalizado');
+       }
        return true;
     } catch (e) {
       // Manejar cualquier error que ocurra durante la transferencia
