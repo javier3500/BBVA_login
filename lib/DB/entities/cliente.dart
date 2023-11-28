@@ -11,6 +11,8 @@ class cliente {
   String? domicilio;
   String? CURP;
   int? saldo = 10000;
+  @Index(unique: true, name: 'noCuenta')
+  int? noCuenta;
 
   @Index(unique: true, name: 'correo')
   String? correo;

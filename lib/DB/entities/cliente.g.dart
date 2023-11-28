@@ -32,18 +32,23 @@ const ClienteSchema = CollectionSchema(
       name: r'domicilio',
       type: IsarType.string,
     ),
-    r'nombre_completo': PropertySchema(
+    r'noCuenta': PropertySchema(
       id: 3,
+      name: r'noCuenta',
+      type: IsarType.long,
+    ),
+    r'nombre_completo': PropertySchema(
+      id: 4,
       name: r'nombre_completo',
       type: IsarType.string,
     ),
     r'saldo': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'saldo',
       type: IsarType.long,
     ),
     r'telefono': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'telefono',
       type: IsarType.string,
     )
@@ -54,6 +59,19 @@ const ClienteSchema = CollectionSchema(
   deserializeProp: _clienteDeserializeProp,
   idName: r'id',
   indexes: {
+    r'noCuenta': IndexSchema(
+      id: 6560556139511464361,
+      name: r'noCuenta',
+      unique: true,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'noCuenta',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    ),
     r'correo': IndexSchema(
       id: -6928770995677321851,
       name: r'correo',
@@ -124,9 +142,10 @@ void _clienteSerialize(
   writer.writeString(offsets[0], object.CURP);
   writer.writeString(offsets[1], object.correo);
   writer.writeString(offsets[2], object.domicilio);
-  writer.writeString(offsets[3], object.nombre_completo);
-  writer.writeLong(offsets[4], object.saldo);
-  writer.writeString(offsets[5], object.telefono);
+  writer.writeLong(offsets[3], object.noCuenta);
+  writer.writeString(offsets[4], object.nombre_completo);
+  writer.writeLong(offsets[5], object.saldo);
+  writer.writeString(offsets[6], object.telefono);
 }
 
 cliente _clienteDeserialize(
@@ -140,9 +159,10 @@ cliente _clienteDeserialize(
   object.correo = reader.readStringOrNull(offsets[1]);
   object.domicilio = reader.readStringOrNull(offsets[2]);
   object.id = id;
-  object.nombre_completo = reader.readStringOrNull(offsets[3]);
-  object.saldo = reader.readLongOrNull(offsets[4]);
-  object.telefono = reader.readStringOrNull(offsets[5]);
+  object.noCuenta = reader.readLongOrNull(offsets[3]);
+  object.nombre_completo = reader.readStringOrNull(offsets[4]);
+  object.saldo = reader.readLongOrNull(offsets[5]);
+  object.telefono = reader.readStringOrNull(offsets[6]);
   return object;
 }
 
@@ -160,10 +180,12 @@ P _clienteDeserializeProp<P>(
     case 2:
       return (reader.readStringOrNull(offset)) as P;
     case 3:
-      return (reader.readStringOrNull(offset)) as P;
-    case 4:
       return (reader.readLongOrNull(offset)) as P;
+    case 4:
+      return (reader.readStringOrNull(offset)) as P;
     case 5:
+      return (reader.readLongOrNull(offset)) as P;
+    case 6:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -183,6 +205,59 @@ void _clienteAttach(IsarCollection<dynamic> col, Id id, cliente object) {
 }
 
 extension clienteByIndex on IsarCollection<cliente> {
+  Future<cliente?> getByNoCuenta(int? noCuenta) {
+    return getByIndex(r'noCuenta', [noCuenta]);
+  }
+
+  cliente? getByNoCuentaSync(int? noCuenta) {
+    return getByIndexSync(r'noCuenta', [noCuenta]);
+  }
+
+  Future<bool> deleteByNoCuenta(int? noCuenta) {
+    return deleteByIndex(r'noCuenta', [noCuenta]);
+  }
+
+  bool deleteByNoCuentaSync(int? noCuenta) {
+    return deleteByIndexSync(r'noCuenta', [noCuenta]);
+  }
+
+  Future<List<cliente?>> getAllByNoCuenta(List<int?> noCuentaValues) {
+    final values = noCuentaValues.map((e) => [e]).toList();
+    return getAllByIndex(r'noCuenta', values);
+  }
+
+  List<cliente?> getAllByNoCuentaSync(List<int?> noCuentaValues) {
+    final values = noCuentaValues.map((e) => [e]).toList();
+    return getAllByIndexSync(r'noCuenta', values);
+  }
+
+  Future<int> deleteAllByNoCuenta(List<int?> noCuentaValues) {
+    final values = noCuentaValues.map((e) => [e]).toList();
+    return deleteAllByIndex(r'noCuenta', values);
+  }
+
+  int deleteAllByNoCuentaSync(List<int?> noCuentaValues) {
+    final values = noCuentaValues.map((e) => [e]).toList();
+    return deleteAllByIndexSync(r'noCuenta', values);
+  }
+
+  Future<Id> putByNoCuenta(cliente object) {
+    return putByIndex(r'noCuenta', object);
+  }
+
+  Id putByNoCuentaSync(cliente object, {bool saveLinks = true}) {
+    return putByIndexSync(r'noCuenta', object, saveLinks: saveLinks);
+  }
+
+  Future<List<Id>> putAllByNoCuenta(List<cliente> objects) {
+    return putAllByIndex(r'noCuenta', objects);
+  }
+
+  List<Id> putAllByNoCuentaSync(List<cliente> objects,
+      {bool saveLinks = true}) {
+    return putAllByIndexSync(r'noCuenta', objects, saveLinks: saveLinks);
+  }
+
   Future<cliente?> getByCorreo(String? correo) {
     return getByIndex(r'correo', [correo]);
   }
@@ -240,6 +315,14 @@ extension clienteQueryWhereSort on QueryBuilder<cliente, cliente, QWhere> {
   QueryBuilder<cliente, cliente, QAfterWhere> anyId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterWhere> anyNoCuenta() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'noCuenta'),
+      );
     });
   }
 }
@@ -305,6 +388,116 @@ extension clienteQueryWhere on QueryBuilder<cliente, cliente, QWhereClause> {
         lower: lowerId,
         includeLower: includeLower,
         upper: upperId,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterWhereClause> noCuentaIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'noCuenta',
+        value: [null],
+      ));
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterWhereClause> noCuentaIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'noCuenta',
+        lower: [null],
+        includeLower: false,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterWhereClause> noCuentaEqualTo(
+      int? noCuenta) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'noCuenta',
+        value: [noCuenta],
+      ));
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterWhereClause> noCuentaNotEqualTo(
+      int? noCuenta) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'noCuenta',
+              lower: [],
+              upper: [noCuenta],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'noCuenta',
+              lower: [noCuenta],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'noCuenta',
+              lower: [noCuenta],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'noCuenta',
+              lower: [],
+              upper: [noCuenta],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterWhereClause> noCuentaGreaterThan(
+    int? noCuenta, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'noCuenta',
+        lower: [noCuenta],
+        includeLower: include,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterWhereClause> noCuentaLessThan(
+    int? noCuenta, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'noCuenta',
+        lower: [],
+        upper: [noCuenta],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterWhereClause> noCuentaBetween(
+    int? lowerNoCuenta,
+    int? upperNoCuenta, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'noCuenta',
+        lower: [lowerNoCuenta],
+        includeLower: includeLower,
+        upper: [upperNoCuenta],
         includeUpper: includeUpper,
       ));
     });
@@ -868,6 +1061,75 @@ extension clienteQueryFilter
     });
   }
 
+  QueryBuilder<cliente, cliente, QAfterFilterCondition> noCuentaIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'noCuenta',
+      ));
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterFilterCondition> noCuentaIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'noCuenta',
+      ));
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterFilterCondition> noCuentaEqualTo(
+      int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'noCuenta',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterFilterCondition> noCuentaGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'noCuenta',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterFilterCondition> noCuentaLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'noCuenta',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterFilterCondition> noCuentaBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'noCuenta',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<cliente, cliente, QAfterFilterCondition>
       nombre_completoIsNull() {
     return QueryBuilder.apply(this, (query) {
@@ -1279,6 +1541,18 @@ extension clienteQuerySortBy on QueryBuilder<cliente, cliente, QSortBy> {
     });
   }
 
+  QueryBuilder<cliente, cliente, QAfterSortBy> sortByNoCuenta() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'noCuenta', Sort.asc);
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterSortBy> sortByNoCuentaDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'noCuenta', Sort.desc);
+    });
+  }
+
   QueryBuilder<cliente, cliente, QAfterSortBy> sortByNombre_completo() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'nombre_completo', Sort.asc);
@@ -1366,6 +1640,18 @@ extension clienteQuerySortThenBy
     });
   }
 
+  QueryBuilder<cliente, cliente, QAfterSortBy> thenByNoCuenta() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'noCuenta', Sort.asc);
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterSortBy> thenByNoCuentaDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'noCuenta', Sort.desc);
+    });
+  }
+
   QueryBuilder<cliente, cliente, QAfterSortBy> thenByNombre_completo() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'nombre_completo', Sort.asc);
@@ -1426,6 +1712,12 @@ extension clienteQueryWhereDistinct
     });
   }
 
+  QueryBuilder<cliente, cliente, QDistinct> distinctByNoCuenta() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'noCuenta');
+    });
+  }
+
   QueryBuilder<cliente, cliente, QDistinct> distinctByNombre_completo(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1471,6 +1763,12 @@ extension clienteQueryProperty
   QueryBuilder<cliente, String?, QQueryOperations> domicilioProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'domicilio');
+    });
+  }
+
+  QueryBuilder<cliente, int?, QQueryOperations> noCuentaProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'noCuenta');
     });
   }
 
