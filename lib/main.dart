@@ -177,11 +177,11 @@ class _LoginPageState extends State<LoginPage> {
     // print(_usernameController.text);
     // Lógica para iniciar sesión
 
-    List<usuario> autenticado = await verificarYAutenticar(_usernameController.text, _passwordController.text);
-    
+    List<usuario> autenticado = await verificarYAutenticar(
+        _usernameController.text, _passwordController.text);
 
-     if (autenticado.isNotEmpty) {
-       Navigator.push(
+    if (autenticado.isNotEmpty) {
+      Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => Indextranferencias(
@@ -202,15 +202,15 @@ class _LoginPageState extends State<LoginPage> {
 
     // if (autenticado) {
     //   // Si las credenciales son correctas, redirige a la vista Indextranferencias
-     
+
     // } else {
     //   // Muestra un mensaje de error si las credenciales son incorrectas
-      
+
     // }
   }
 
-  final isar = IsarHelper.instance.isar;//conexión a base de
- 
+  final isar = IsarHelper.instance.isar; //conexión a base de
+
   Future<List<usuario>> verificarYAutenticar(String nombre, String pass) async {
     final usuarios = await isar.usuarios
         .filter()
@@ -218,8 +218,8 @@ class _LoginPageState extends State<LoginPage> {
         .and()
         .contrasenaEqualTo(pass)
         .findAll();
-   
-      return usuarios; // Usuario autenticado
+
+    return usuarios; // Usuario autenticado
   }
 }
 
