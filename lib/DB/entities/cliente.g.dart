@@ -35,7 +35,7 @@ const ClienteSchema = CollectionSchema(
     r'noCuenta': PropertySchema(
       id: 3,
       name: r'noCuenta',
-      type: IsarType.long,
+      type: IsarType.string,
     ),
     r'nombre_completo': PropertySchema(
       id: 4,
@@ -67,8 +67,8 @@ const ClienteSchema = CollectionSchema(
       properties: [
         IndexPropertySchema(
           name: r'noCuenta',
-          type: IndexType.value,
-          caseSensitive: false,
+          type: IndexType.hash,
+          caseSensitive: true,
         )
       ],
     ),
@@ -119,6 +119,12 @@ int _clienteEstimateSize(
     }
   }
   {
+    final value = object.noCuenta;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.nombre_completo;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
@@ -142,7 +148,7 @@ void _clienteSerialize(
   writer.writeString(offsets[0], object.CURP);
   writer.writeString(offsets[1], object.correo);
   writer.writeString(offsets[2], object.domicilio);
-  writer.writeLong(offsets[3], object.noCuenta);
+  writer.writeString(offsets[3], object.noCuenta);
   writer.writeString(offsets[4], object.nombre_completo);
   writer.writeLong(offsets[5], object.saldo);
   writer.writeString(offsets[6], object.telefono);
@@ -159,7 +165,7 @@ cliente _clienteDeserialize(
   object.correo = reader.readStringOrNull(offsets[1]);
   object.domicilio = reader.readStringOrNull(offsets[2]);
   object.id = id;
-  object.noCuenta = reader.readLongOrNull(offsets[3]);
+  object.noCuenta = reader.readStringOrNull(offsets[3]);
   object.nombre_completo = reader.readStringOrNull(offsets[4]);
   object.saldo = reader.readLongOrNull(offsets[5]);
   object.telefono = reader.readStringOrNull(offsets[6]);
@@ -180,7 +186,7 @@ P _clienteDeserializeProp<P>(
     case 2:
       return (reader.readStringOrNull(offset)) as P;
     case 3:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 4:
       return (reader.readStringOrNull(offset)) as P;
     case 5:
@@ -205,38 +211,38 @@ void _clienteAttach(IsarCollection<dynamic> col, Id id, cliente object) {
 }
 
 extension clienteByIndex on IsarCollection<cliente> {
-  Future<cliente?> getByNoCuenta(int? noCuenta) {
+  Future<cliente?> getByNoCuenta(String? noCuenta) {
     return getByIndex(r'noCuenta', [noCuenta]);
   }
 
-  cliente? getByNoCuentaSync(int? noCuenta) {
+  cliente? getByNoCuentaSync(String? noCuenta) {
     return getByIndexSync(r'noCuenta', [noCuenta]);
   }
 
-  Future<bool> deleteByNoCuenta(int? noCuenta) {
+  Future<bool> deleteByNoCuenta(String? noCuenta) {
     return deleteByIndex(r'noCuenta', [noCuenta]);
   }
 
-  bool deleteByNoCuentaSync(int? noCuenta) {
+  bool deleteByNoCuentaSync(String? noCuenta) {
     return deleteByIndexSync(r'noCuenta', [noCuenta]);
   }
 
-  Future<List<cliente?>> getAllByNoCuenta(List<int?> noCuentaValues) {
+  Future<List<cliente?>> getAllByNoCuenta(List<String?> noCuentaValues) {
     final values = noCuentaValues.map((e) => [e]).toList();
     return getAllByIndex(r'noCuenta', values);
   }
 
-  List<cliente?> getAllByNoCuentaSync(List<int?> noCuentaValues) {
+  List<cliente?> getAllByNoCuentaSync(List<String?> noCuentaValues) {
     final values = noCuentaValues.map((e) => [e]).toList();
     return getAllByIndexSync(r'noCuenta', values);
   }
 
-  Future<int> deleteAllByNoCuenta(List<int?> noCuentaValues) {
+  Future<int> deleteAllByNoCuenta(List<String?> noCuentaValues) {
     final values = noCuentaValues.map((e) => [e]).toList();
     return deleteAllByIndex(r'noCuenta', values);
   }
 
-  int deleteAllByNoCuentaSync(List<int?> noCuentaValues) {
+  int deleteAllByNoCuentaSync(List<String?> noCuentaValues) {
     final values = noCuentaValues.map((e) => [e]).toList();
     return deleteAllByIndexSync(r'noCuenta', values);
   }
@@ -315,14 +321,6 @@ extension clienteQueryWhereSort on QueryBuilder<cliente, cliente, QWhere> {
   QueryBuilder<cliente, cliente, QAfterWhere> anyId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
-    });
-  }
-
-  QueryBuilder<cliente, cliente, QAfterWhere> anyNoCuenta() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        const IndexWhereClause.any(indexName: r'noCuenta'),
-      );
     });
   }
 }
@@ -414,7 +412,7 @@ extension clienteQueryWhere on QueryBuilder<cliente, cliente, QWhereClause> {
   }
 
   QueryBuilder<cliente, cliente, QAfterWhereClause> noCuentaEqualTo(
-      int? noCuenta) {
+      String? noCuenta) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
         indexName: r'noCuenta',
@@ -424,7 +422,7 @@ extension clienteQueryWhere on QueryBuilder<cliente, cliente, QWhereClause> {
   }
 
   QueryBuilder<cliente, cliente, QAfterWhereClause> noCuentaNotEqualTo(
-      int? noCuenta) {
+      String? noCuenta) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -455,51 +453,6 @@ extension clienteQueryWhere on QueryBuilder<cliente, cliente, QWhereClause> {
               includeUpper: false,
             ));
       }
-    });
-  }
-
-  QueryBuilder<cliente, cliente, QAfterWhereClause> noCuentaGreaterThan(
-    int? noCuenta, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'noCuenta',
-        lower: [noCuenta],
-        includeLower: include,
-        upper: [],
-      ));
-    });
-  }
-
-  QueryBuilder<cliente, cliente, QAfterWhereClause> noCuentaLessThan(
-    int? noCuenta, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'noCuenta',
-        lower: [],
-        upper: [noCuenta],
-        includeUpper: include,
-      ));
-    });
-  }
-
-  QueryBuilder<cliente, cliente, QAfterWhereClause> noCuentaBetween(
-    int? lowerNoCuenta,
-    int? upperNoCuenta, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'noCuenta',
-        lower: [lowerNoCuenta],
-        includeLower: includeLower,
-        upper: [upperNoCuenta],
-        includeUpper: includeUpper,
-      ));
     });
   }
 
@@ -1078,46 +1031,54 @@ extension clienteQueryFilter
   }
 
   QueryBuilder<cliente, cliente, QAfterFilterCondition> noCuentaEqualTo(
-      int? value) {
+    String? value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'noCuenta',
         value: value,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<cliente, cliente, QAfterFilterCondition> noCuentaGreaterThan(
-    int? value, {
+    String? value, {
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
         property: r'noCuenta',
         value: value,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<cliente, cliente, QAfterFilterCondition> noCuentaLessThan(
-    int? value, {
+    String? value, {
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
         property: r'noCuenta',
         value: value,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<cliente, cliente, QAfterFilterCondition> noCuentaBetween(
-    int? lower,
-    int? upper, {
+    String? lower,
+    String? upper, {
     bool includeLower = true,
     bool includeUpper = true,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
@@ -1126,6 +1087,75 @@ extension clienteQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterFilterCondition> noCuentaStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'noCuenta',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterFilterCondition> noCuentaEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'noCuenta',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterFilterCondition> noCuentaContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'noCuenta',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterFilterCondition> noCuentaMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'noCuenta',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterFilterCondition> noCuentaIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'noCuenta',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<cliente, cliente, QAfterFilterCondition> noCuentaIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'noCuenta',
+        value: '',
       ));
     });
   }
@@ -1712,9 +1742,10 @@ extension clienteQueryWhereDistinct
     });
   }
 
-  QueryBuilder<cliente, cliente, QDistinct> distinctByNoCuenta() {
+  QueryBuilder<cliente, cliente, QDistinct> distinctByNoCuenta(
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'noCuenta');
+      return query.addDistinctBy(r'noCuenta', caseSensitive: caseSensitive);
     });
   }
 
@@ -1766,7 +1797,7 @@ extension clienteQueryProperty
     });
   }
 
-  QueryBuilder<cliente, int?, QQueryOperations> noCuentaProperty() {
+  QueryBuilder<cliente, String?, QQueryOperations> noCuentaProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'noCuenta');
     });

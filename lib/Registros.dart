@@ -1,4 +1,6 @@
 //import 'dart:convert';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 //import 'package:flutter/material.dart';
 import 'main.dart';
@@ -171,7 +173,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
   
   Future<void> _RegistrationUser() async {
      final isar = IsarHelper.instance.isar;
-     final client = cliente()..nombre_completo = _NameController.text..telefono = _CelController.text..domicilio = _addressController.text..CURP = _CURPController.text..correo = _emailController.text;
+     //generador de número de cuenta
+     String id_banco = "234754";
+     int numero = Random().nextInt(1000000) + 100000;
+     String verificador = "43251";
+     String numerocuenta = id_banco + numero.toString() + verificador;
+     
+     final client = cliente()..nombre_completo = _NameController.text..telefono = _CelController.text..domicilio = _addressController.text..CURP = _CURPController.text..noCuenta = numerocuenta..correo = _emailController.text;
      final user = usuario()..nombre_usuario = _usernameController.text..contrasena = _passwordController.text..correo =  _emailController.text;
 
      try{

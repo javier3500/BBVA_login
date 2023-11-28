@@ -12,7 +12,7 @@ class cliente {
   String? CURP;
   int? saldo = 10000;
   @Index(unique: true, name: 'noCuenta')
-  int? noCuenta;
+  String? noCuenta;
 
   @Index(unique: true, name: 'correo')
   String? correo;

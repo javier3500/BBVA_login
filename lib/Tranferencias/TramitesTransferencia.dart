@@ -9,8 +9,12 @@ import 'package:login_session/DB/isar.dart';
 import 'package:login_session/DB/entities/cliente.dart';
 
 class BuscarUsuarioScreen extends StatefulWidget {
+  
+  String? correo;
+  int? saldo;
+  BuscarUsuarioScreen(this.correo, this.saldo);
   @override
-  _BuscarUsuarioScreenState createState() => _BuscarUsuarioScreenState();
+  _BuscarUsuarioScreenState createState() => _BuscarUsuarioScreenState(this.correo, this.saldo);
 }
 
 class _BuscarUsuarioScreenState extends State<BuscarUsuarioScreen> {
@@ -20,11 +24,17 @@ class _BuscarUsuarioScreenState extends State<BuscarUsuarioScreen> {
   TextEditingController _numeroCuentaController = TextEditingController();
   bool bandera = false;
 
+  String? correo;
+  int? saldo;
+
+  _BuscarUsuarioScreenState(this.correo, this.saldo);
+
   List<cliente>? _usuarios;
 
   @override
   Widget build(BuildContext context) {
     print(bandera);
+    print(this.correo);
     return Scaffold(
       appBar: AppBar(
         title: Text('Buscar Usuario'),
@@ -147,7 +157,16 @@ class _BuscarUsuarioScreenState extends State<BuscarUsuarioScreen> {
                     if (bandera)
                       _buildRealizarTransferenciaButton(
                           cliente.nombre_completo ?? "Nombre no disponible",
-                          cliente.saldo ?? 0),
+                          this.correo ?? "Correo no disponible",
+                          this.saldo ?? 0,
+
+                          cliente.correo ?? "correo no disponible",
+                          cliente.saldo ?? 0,
+                          cliente.CURP ?? "correo no disponible",
+                          cliente.noCuenta ?? "No cuenta no disponible",
+                          cliente.telefono ?? "telefono no disponible",
+                          cliente.domicilio ?? "domicilio no disponle"
+                      )
                   ],
                 ),
             ],
@@ -157,14 +176,16 @@ class _BuscarUsuarioScreenState extends State<BuscarUsuarioScreen> {
     );
   }
 
-  Widget _buildRealizarTransferenciaButton(String nombre_completo, int saldo) {
+  Widget _buildRealizarTransferenciaButton(String nombre_completo, String? correo, int? saldo, String? correoClient, int? saldoClient,
+  String? CURP, String? noCuenta, String? telefono, String? domicilio ) {
     return ElevatedButton(
       onPressed: () {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => RealizarTransferenciaScreen(
-                nombreCliente: nombre_completo, saldo: saldo),
+                nombreCliente: nombre_completo, correo: correo, saldo: saldo, correoClient: correoClient,
+                saldoClient: saldoClient, CURP: CURP, noCuenta: noCuenta, telefono: telefono, domicilio: domicilio,),
           ),
         );
       },
@@ -189,8 +210,9 @@ class _BuscarUsuarioScreenState extends State<BuscarUsuarioScreen> {
   }
 
   Future<List<cliente>> _verificacionCuenta(String numeroCuenta) async {
+  
     final datos =
-        await isar.clientes.filter().telefonoEqualTo(numeroCuenta).findAll();
+        await isar.clientes.filter().noCuentaEqualTo(numeroCuenta).findAll();
     return datos;
   }
 }

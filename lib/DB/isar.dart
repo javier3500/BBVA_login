@@ -22,30 +22,3 @@ class IsarHelper {
     _isarDb = await Isar.open([UsuarioSchema,TransaccionSchema, ClienteSchema], directory: path);
   }
 }
-
-// class IsarService{
-//   late Future<Isar> db;
-  
-//   IsarService(){
-//     db= openDB();
-//   }
-
-//   Future<Isar> openDB()async {
-//     final dir = await getApplicationDocumentsDirectory();
-
-//     if(Isar.instanceNames.isEmpty){
-//       return await Isar.open(
-//         [
-//          UsuarioSchema,
-//          TransaccionSchema, 
-//          ClienteSchema
-//          ], 
-//          directory: dir.path,
-//           inspector: true,
-//        );
-//     }
-
-//     return Future.value(Isar.getInstance());
-
-//   }
-// }

@@ -14,6 +14,7 @@ import 'package:login_session/DB/isar.dart';
 
 //entidades
 import 'package:login_session/DB/entities/usuario.dart';
+import 'package:login_session/DB/entities/cliente.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); //Inicializar conexión
@@ -181,6 +182,7 @@ class _LoginPageState extends State<LoginPage> {
         _usernameController.text, _passwordController.text);
 
     if (autenticado.isNotEmpty) {
+      List<cliente> autenticadoclient = await clienteDatos(autenticado[0].correo);
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -188,6 +190,9 @@ class _LoginPageState extends State<LoginPage> {
             //pasamos los parametros a indextransferencias
             autenticado[0].nombre_usuario,
             autenticado[0].correo,
+            autenticadoclient[0].saldo,
+            autenticadoclient[0].noCuenta
+            
           ),
         ),
       );
@@ -218,14 +223,14 @@ class _LoginPageState extends State<LoginPage> {
         .and()
         .contrasenaEqualTo(pass)
         .findAll();
-
     return usuarios; // Usuario autenticado
   }
-}
 
-class usuarioverificado {
-  String? nombre_usuario;
-  String? correo;
-
-  usuarioverificado(this.nombre_usuario, this.correo);
+  Future<List<cliente>> clienteDatos(String? correo) async {
+    final client = await isar.clientes
+        .filter()
+        .correoEqualTo(correo, caseSensitive: false)
+        .findAll();
+    return client; // Usuario autenticado
+  }
 }

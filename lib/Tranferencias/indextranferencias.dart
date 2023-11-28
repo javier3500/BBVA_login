@@ -20,12 +20,12 @@ class Indextranferencias extends StatelessWidget {
   
   String? user_name;
   String? correo;
+  int? saldo;
+  String? noCuenta;
   Key? key;
   List<transaccion> trans = [];
-
-  Indextranferencias(this.user_name, this.correo) {
-    //trans = listaTrans(this.correo) as List<transaccion>;
-  }
+  bool bandera = false;
+  Indextranferencias(this.user_name, this.correo, this.saldo, this.noCuenta);
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +46,15 @@ class Indextranferencias extends StatelessWidget {
           children: [
             // Monto imaginario
             Text(
-              '\$10,000.00',
+               'No. cuenta: ${this.noCuenta?? "No disponible"}',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF003366), // Azul oscuro
+              ),
+            ),
+            Text(
+               'saldo: ${this.saldo?? "No disponible"}',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -61,7 +69,7 @@ class Indextranferencias extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => BuscarUsuarioScreen(),
+                    builder: (context) => BuscarUsuarioScreen(this.correo, this.saldo),
                   ),
                 );
               },
@@ -89,7 +97,7 @@ class Indextranferencias extends StatelessWidget {
               ),
             ),
             SizedBox(height: 24),
-            // Historial de transferencias imaginario
+            // Historial de transferencias
             Container(
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -108,49 +116,23 @@ class Indextranferencias extends StatelessWidget {
                       color: Color(0xFF003366), // Azul oscuro
                     ),
                   ),
-                  ListView.builder(
-                    primary: false,
-                    
-                    itemCount: 5,
-                    itemBuilder: (context, index) {
-                      //final transfe = trans[index];
-                      return ListTile(
-                        title: Text('Hola'),
-                      );
-                  
-                     }),
-                  
 
-                  // Expanded(
-                  //   child: ListView.separated(
-                  //     itemCount: trans.length,
-                  //     itemBuilder: (context, index){
-                  //       final transaccion = trans[index];
-                  //       return TransferenciaItem (
-                  //         fecha: transaccion.fecha,
-                  //         monto: '${transaccion.monto}',
-                  //         concepto: transaccion.concepto,
-                  //       );
-                  //     },
-                  //     separatorBuilder: (context, index) => const Divider(),
-                  //   ),
-                  // ),
-                  // SizedBox(height: 12),
-                  // TransferenciaItem(
-                  //   fecha: '10/11/2023',
-                  //   monto: '\$500.00',
-                  //   concepto: 'Compra en línea',
-                  // ),
-                  // TransferenciaItem(
-                  //   fecha: '09/11/2023',
-                  //   monto: '\$200.00',
-                  //   concepto: 'Almuerzo',
-                  // ),
-                  // TransferenciaItem(
-                  //   fecha: '08/11/2023',
-                  //   monto: '\$1000.00',
-                  //   concepto: 'Pago de factura',
-                  // ),
+                  FutureBuilder<List<transaccion>>(
+                      future: _getAllTransaccion(this.correo),
+                      builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                         return CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                         return Text('Error: ${snapshot.error}');
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                         return Text('No se encontraron datos.');
+                      } else {
+                         trans = snapshot.data!;
+                          bandera = true;
+                       return _buildTransaccionInfo(trans);
+                     }
+                    },
+                   ),
                 ],
               ),
             ),
@@ -159,27 +141,68 @@ class Indextranferencias extends StatelessWidget {
       ),
     );
   }
-}
 
-Future<List<transaccion>> listaTrans (String? correo){
-  final trans = getAllTransaccion(correo);
-  return trans;
+
+
+
+  Widget _buildTransaccionInfo(List<transaccion> transacciones) {
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Color(0xFFE0E0E0),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var transaccion in transacciones)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                      SizedBox(height: 8),
+                      SizedBox(height: 8),
+                       SizedBox(height: 8),
+                    Text(
+                      'Fecha: ${transaccion.fecha ?? "No disponible"}',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Concepto: ${transaccion.concepto ?? "No disponible"}',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                      SizedBox(height: 8),
+                      Text(
+                      'monto: ${transaccion.monto ?? "No disponible"}',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                      ),
+                  ],
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 
 final isar = IsarHelper.instance.isar;//conexión a base de
- Future<List<transaccion>> getAllTransaccion(String? correo) async{
+ Future<List<transaccion>> _getAllTransaccion(String? correo) async{
   print('hola ${correo}');
   final listTransaccion = await isar.transaccions
         .filter()
         .correoEqualTo(correo, caseSensitive: false)
         .findAll();
-
     return listTransaccion;
-  }
-
-  void mostrar(){
-    print('Hola');
   }
 
   Future<List<usuario>> verificarYAutenticar(String nombre, String pass) async {
