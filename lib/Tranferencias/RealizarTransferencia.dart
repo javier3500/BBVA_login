@@ -9,6 +9,9 @@ import 'package:login_session/DB/isar.dart';
 //entidades
 import 'package:login_session/DB/entities/cliente.dart';
 import 'package:login_session/DB/entities/transacciones.dart';
+import 'package:login_session/DB/entities/usuario.dart';
+
+import 'indextranferencias.dart';
 
 class RealizarTransferenciaScreen extends StatelessWidget {
   final String nombreCliente;
@@ -27,6 +30,7 @@ class RealizarTransferenciaScreen extends StatelessWidget {
         required this.nombreCliente, 
         required this.correo,
         required this.saldo,
+
         required this.correoClient,
         required this.saldoClient,
         required this.CURP,
@@ -91,20 +95,35 @@ class RealizarTransferenciaScreen extends StatelessWidget {
 
                 if (transferenciaExitosa) {
                   ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content:
-              Text('Transferencia realizada'),
-          backgroundColor: const Color.fromARGB(255, 244, 212, 54),
+                     SnackBar(
+                        content: Text('Transferencia realizada'),
+                        backgroundColor: const Color.fromARGB(255, 244, 212, 54),
+                     ),
+                  );  
+                   List<usuario> autenticado = await usuarioDatos(this.correo);
+                   List<cliente> autenticadoclient = await clienteDatos(this.correo);
+                  Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Indextranferencias(
+            //pasamos los parametros a indextransferencias
+            autenticado[0].nombre_usuario,
+            autenticado[0].correo,
+            autenticadoclient[0].saldo,
+            autenticadoclient[0].noCuenta
+            
+          ),
         ),
-      );             
+      );
+                  // ignore: use_build_context_synchronously
+                          
                 } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content:
-              Text('Transferencia no realizada.'),
-          backgroundColor: Color.fromARGB(255, 244, 73, 54),
-        ),
-      );      
+                  ScaffoldMessenger.of(context).showSnackBar(
+                     SnackBar(
+                        content:Text('Transferencia no realizada.'),
+                        backgroundColor: Color.fromARGB(255, 244, 73, 54),
+                     ),
+                  );      
                 }
               },
               child: Text('Realizar Transferencia'),
@@ -118,60 +137,50 @@ class RealizarTransferenciaScreen extends StatelessWidget {
     );
   }
 
- 
   final isar = IsarHelper.instance.isar; //conexión a base de
   Future<bool> realizarTransferencia(String cantidad, String concepto, int? saldo, String? correo) async {
     try {
+      //calculamos el saldo actual
       int? cantidad1 = int.parse(cantidad);
       int? saldo1 = saldo;
       int? diferencia = saldo1! - cantidad1;
       int? NewsaldoCliente = cantidad1 + saldoClient!;
-      print(diferencia);
-      print(NewsaldoCliente);
-       if(diferencia >= 0){
-         final transac = transaccion()..fecha = '28/11/2023'..concepto = concepto..monto = cantidad..correo = correo;
-         
-         await isar.writeTxn(() async{
-         await isar.transaccions.put(transac); 
-         });
 
+       if(diferencia >= 0){
+         //verifica si el cliente existe
           final getcliente = await isar.clientes
           .filter()
           .correoEqualTo(correo, caseSensitive: false)
-          .findAll();
+          .findFirst();
 
-          if(getcliente != null){
-             final client = cliente()..nombre_completo = getcliente[0].nombre_completo
-             .. telefono = getcliente[0].telefono
-             ..domicilio = getcliente[0].domicilio
-             ..CURP = getcliente[0].CURP
-             ..noCuenta = getcliente[0].noCuenta
-             ..correo = getcliente[0].correo
-             ..saldo = diferencia; 
+          final getclienteTransferencia = await isar.clientes
+            .filter()
+            .correoEqualTo(this.correoClient, caseSensitive: false)
+            .findFirst();
+            
 
+          if(getcliente != null && getclienteTransferencia != null){
+            
+            //inseta una transacción
+           final transac = transaccion()..fecha = '02/12/2023'..concepto = concepto..monto = cantidad..correo = correo;
+           await isar.writeTxn(() async{
+              await isar.transaccions.put(transac); 
+           });
+
+            //Registramos el saldo
+             getcliente.saldo = diferencia;
               await isar.writeTxn(() async{
-              await isar.clientes.put(client);
+                   await isar.clientes.put(getcliente);
+               });
 
-               final clientTrans = cliente()
-               ..nombre_completo = this.nombreCliente
-             .. telefono = this.telefono
-             ..domicilio = this.domicilio
-             ..CURP = this.CURP
-             ..noCuenta = this.noCuenta
-             ..correo = this.correoClient
-             ..saldo = NewsaldoCliente; 
-
+             //Registramos el saldo
+             getclienteTransferencia.saldo = NewsaldoCliente;
               await isar.writeTxn(() async{
-              await isar.clientes.put(clientTrans);
+              await isar.clientes.put(getclienteTransferencia);
               });
-            });
-          }else{
-            print('No existe el cliente');
-            throw Exception('Ocurrió un error personalizado');
           }
        }else{
-         print('se sobre pasa');
-         throw Exception('Ocurrió un error personalizado');
+         throw Exception('Saldo insuficiente');
        }
        return true;
     } catch (e) {
@@ -187,5 +196,13 @@ class RealizarTransferenciaScreen extends StatelessWidget {
         .correoEqualTo(correo, caseSensitive: false)
         .findAll();
     return client; // Usuario autenticado
+  }
+
+  Future<List<usuario>> usuarioDatos(String? correo) async {
+  final user = await isar.usuarios
+        .filter()
+        .correoEqualTo(correo, caseSensitive: false)
+        .findAll();
+    return user; // Usuario autenticado
   }
 }

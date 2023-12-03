@@ -39,8 +39,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: SingleChildScrollView(
+          child:  Column(
+            mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
               controller: _usernameController,
@@ -166,12 +167,30 @@ class _RegistrationPageState extends State<RegistrationPage> {
               ),
             ),
           ],
+          ),
+          
         ),
       ),
     );
   }
+
+
   
   Future<void> _RegistrationUser() async {
+
+    //     // Validar que el nombre de usuario no contenga caracteres especiales ni espacios vacíos
+    // if (_.text.contains(RegExp(r'[^\w]')) ||
+    //     _usernameController.text.contains(' ')) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(
+    //       content: Text('Nombre de usuario no válido'),
+    //       backgroundColor: Colors.red,
+    //     ),
+    //   );
+    //   return;
+    // }
+
+
      final isar = IsarHelper.instance.isar;
      //generador de número de cuenta
      String id_banco = "234754";

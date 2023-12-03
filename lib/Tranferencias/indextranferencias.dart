@@ -30,9 +30,6 @@ class Indextranferencias extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     
-    print(this.user_name);//verificamos que si esta pasando los datos
-    print(this.correo);//verificamos que si esta pasando los datos
-    print(trans.isNotEmpty);
     //<print(trans[0].concepto);
     return Scaffold(
       appBar: AppBar(
@@ -41,7 +38,8 @@ class Indextranferencias extends StatelessWidget {
         backgroundColor: Color(0xFF003366), // Azul oscuro
       ),
       body: Center(
-        child: Column(
+        child:  SingleChildScrollView(
+          child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Monto imaginario
@@ -138,6 +136,8 @@ class Indextranferencias extends StatelessWidget {
             ),
           ],
         ),
+
+        ),
       ),
     );
   }
@@ -215,6 +215,14 @@ final isar = IsarHelper.instance.isar;//conexión a base de
    
       return usuarios; // Usuario autenticado
   }
+
+   Future<List<cliente>> clienteDatos(String? correo) async {
+       final client = await isar.clientes
+        .filter()
+        .correoEqualTo(correo, caseSensitive: false)
+        .findAll();
+        return client; // Usuario autenticado
+   } 
 
 class TransferenciaItem extends StatelessWidget {
   String? fecha;
